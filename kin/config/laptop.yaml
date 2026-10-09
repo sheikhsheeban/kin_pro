@@ -1,0 +1,96 @@
+# Laptop demo profile (default). Simulated hardware driven by the web UI.
+profile: laptop
+hardware: simulated
+models_dir: models
+
+audio:
+  frame_samples: 512
+  ring_buffer_seconds: 30
+  device: null
+  preroll_ms: 300
+
+vad:
+  threshold: 0.5
+  min_speech_ms: 96
+  min_silence_ms: 600
+
+wake:
+  enabled: true
+  phrase: "Hey Jarvis"   # stock word until a custom "Hey Kin" model is trained
+  model: openwakeword/hey_jarvis_v0.1.onnx
+  threshold: 0.5          # score needed to wake; see your scores with scripts/wake_probe.py
+
+stt:
+  passive: { arch: small-streaming }   # laptop: Small for passive lines too (fewer misheard names)
+  query: { arch: small-streaming }
+  update_interval_s: 0.3
+  lazy_load_query: false
+
+runtime:
+  threads: null
+
+llm:
+  backend: litert
+  model: llm/gemma-4-E2B-it.litertlm
+  fallback_backend: llamacpp
+  fallback_model: llm/Qwen3.5-2B-Q4_K_M.gguf
+  context_tokens: 4096      # hard KV-cache cap
+  max_output_tokens: 160
+  timeout_s: 20
+
+router:                    # pre-filter only: marks all-chatter episodes (EmbeddingGemma k-NN, config/router_examples.yaml)
+  examples: router_examples.yaml
+  k: 5
+  accept_score: 0.55       # measured on 42 held-out lines: 0.55/0.06 accepts 33/42 at 100% accuracy;
+  accept_margin: 0.06      # 0.70/0.08 accepts only 6/42 and sends the rest to the LLM (tests/test_semantic_router.py)
+
+extract:                   # background fact extraction per episode (Gemma 4 E2B, background priority)
+  episode_gap_s: 90        # new episode after 90 s of silence
+  episode_max_s: 600       # or after 10 minutes
+  idle_s: 0             # extract as soon as no question is running
+  dedup_similarity: 0.75   # close active facts -> one ADD/UPDATE/DUPLICATE/CONTRADICTS question
+  name_match: 80           # rapidfuzz ratio for misheard names (Pria -> Priya)
+
+memory:
+  db_path: data/kin.db     # SQLCipher, encrypted at rest
+  key_file: data/kin.key   # or set KIN_DB_KEY
+  embedding_variant: q4
+  dim: 256
+  top_k: 5
+  retrieval:               # hybrid recall: EmbeddingGemma + BM25, RRF (k=60), time/person filters (memory/retrieval.py)
+    # answer_floor: under it Kin says "I don't remember" without asking the LLM. The confidence is cosine +
+    # 0.3 x word coverage (best fact offered). Calibrated on the recall benchmark (scripts/calibrate_floor.py,
+    # clean + noisy, 198 questions, the LLM answering every question at floor 0, each floor replayed):
+    #   floor 0.000-0.375: 113 correct, made-up answers 1/198 (0.5%), all false answers 24/198 (12.1%)
+    #   floor 0.500:       109 correct, 0.5%, 12.1%   floor 0.650: 107 correct, 0.0%, 10.6%
+    #   floor 0.875:       100 correct, 0.0%,  6.6%
+    # 0.375 = the most correct answers with made-up answers under 2%. No floor brings ALL false answers under
+    # 2%: most are wrong or incomplete answers with a high confidence (the wrong one of two similar facts).
+    answer_floor: 0.375
+    strong_score: 0.75     # >= this: one LLM call. Offline: 57/81 answerable over it, 0-1 of 18 unanswerable,
+                           # support in the top 5 for 95% of them (scripts/eval_retrieval.py)
+    utterance_floor: 0.8   # "heard on": the lowest line score no unanswerable question reached (clean and noisy)
+    rerank: true           # MiniLM cross-encoder over the fused top 10: recall@5 0.756 -> 0.771 clean, 0.788 -> 0.820 noisy
+  prompt_token_budget: 1000
+  utterance_retention_days: 14   # raw transcript lines (evidence) are purged daily after this
+
+tts:
+  enabled: true
+  voice: tts/en_US-lessac-medium.onnx
+  ack_text: "Let me check."
+  ack_delay_s: 0.8
+
+gateway:
+  enabled: true
+  autostart: true          # on the Pi this becomes its own systemd unit (Phase 4)
+  providers: real          # real | fake (canned answers, no internet needed)
+  upstream_timeout_s: 6
+
+user:
+  home_city: Nagpur        # default place for weather questions
+
+network_guard: true        # brain process may not open outbound sockets
+
+ui:
+  host: 127.0.0.1
+  port: 8000

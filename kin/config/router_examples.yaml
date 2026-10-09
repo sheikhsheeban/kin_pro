@@ -1,0 +1,112 @@
+# Example sentences for the passive semantic router (kin/brain/semantic_router.py).
+# Each overheard line is embedded with EmbeddingGemma and compared with these (k-nearest per label).
+# Edit freely: the vectors are recomputed at start-up whenever this file changes.
+# Keep them generic; never put real personal data here.
+
+commitment:
+  - I'm meeting Sam at 3 pm at the station.
+  - I need to email the landlord tomorrow morning.
+  - I have a dentist appointment on Tuesday at 10.
+  - I promised Leo I'd return his bike this weekend.
+  - I'll call the bank back after lunch.
+  - The report is due on Friday.
+  - I have to pick up the kids at 4.
+  - We're having dinner with the neighbours on Saturday at seven.
+  - I'm going to submit the application tonight.
+  - Remind me to buy oat milk.
+  - Don't forget to pay the electricity bill by the end of the month.
+  - My flight to Berlin leaves at 6 am on Monday.
+  - I should book a table for Thursday night.
+  - The plumber is coming tomorrow between 9 and 11.
+  - I told Mia I'd send her the photos tonight.
+  - I've got a job interview next Wednesday at two.
+  - I need to renew my passport before March.
+  - Let's meet at the cafe at half past five.
+  - I must drop off the parcel at the post office today.
+  - The team call got moved to 11.
+  - I'm picking up Grandma from the airport on Sunday.
+  - I have to finish the slides before the meeting.
+  - My car is due for a service next week.
+  - I said I'd water their plants while they're away.
+  - The parent-teacher meeting is on the 14th.
+
+fact_about_person:
+  - Karan is allergic to shellfish.
+  - My sister's birthday is on the 12th of March.
+  - Anna is vegetarian.
+  - Sam just moved to Lisbon for a new job.
+  - Leo loves jazz and plays the saxophone.
+  - My boss prefers emails to phone calls.
+  - Mia's daughter started school this year.
+  - Dad can't eat gluten.
+  - Tom works at the hospital as a nurse.
+  - My neighbour has two cats called Pixel and Mango.
+  - Grandma lives in Pune.
+  - Nina hates surprise parties.
+  - Raj is learning Japanese.
+  - My cousin is getting married in June.
+  - Ella's favourite flower is the sunflower.
+  - Ben doesn't drink coffee, only tea.
+  - My manager is called Laura.
+  - Omar studied physics at university.
+  - Priya's son is three years old.
+  - Mum takes her medicine every evening.
+  - Jake broke his arm playing football.
+  - My brother is afraid of flying.
+  - Zara speaks four languages.
+  - Arjun supports Liverpool.
+  - Lucy has a nut allergy too.
+
+idea:
+  - What if we made an app that tracks shared expenses?
+  - We could start a YouTube channel about old recipes.
+  - It would be cool to build a little library box outside.
+  - Maybe I should write a blog about cooking on a budget.
+  - We should try running a small bakery stall at the market.
+  - An idea for the garden would be a little herb spiral.
+  - I could build a bird feeder with a camera.
+  - Let's make a short film about the neighbourhood.
+  - A startup idea, a service that repairs old headphones.
+  - What if the kitchen had a whiteboard for the shopping list?
+  - Maybe we could turn the spare room into a studio.
+  - I want to try making a newsletter for the building.
+  - It'd be fun to organise a book swap at work.
+  - We could add a dark mode to the app.
+  - An app that reminds you to call your parents would be nice.
+  - I should make a playlist for every month of the year.
+  - What about a cycling trip along the coast next summer?
+  - We could use solar panels on the shed.
+  - I had an idea for a children's book about a lost robot.
+  - Let's try a no-phone dinner once a week.
+  - Maybe a subscription box for local snacks?
+  - It would be great to learn pottery together.
+  - We could set up a shared calendar for the family.
+  - An interesting project would be a weather station on the roof.
+  - I might design my own keyboard layout.
+
+chatter:
+  - Alright, that works for me.
+  - Yeah, I think so too honestly.
+  - What a lovely sunny day.
+  - Could you hand me that cup?
+  - The show last night was a bit boring.
+  - Haha, you're hilarious.
+  - Hmm, I'm not sure.
+  - Oh wow, really?
+  - Anyway, where was I?
+  - I'm so tired today.
+  - This coffee is really good.
+  - Did you see that?
+  - It's getting dark early these days.
+  - Right, right, makes sense.
+  - Let me think about it.
+  - What time is it?
+  - No worries at all.
+  - That's a nice shirt.
+  - I don't know, maybe.
+  - The traffic was terrible this morning.
+  - Hold on a second.
+  - Good morning, how did you sleep?
+  - Thanks, that's really kind.
+  - I love this song.
+  - It's so loud in here.

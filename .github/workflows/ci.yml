@@ -1,0 +1,21 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: uv sync --dev
+      - name: Chromium for the browser tests
+        run: uv run playwright install --with-deps chromium  # a no-op where Chromium is pre-installed
+      - name: Tests (no downloaded models or microphone needed; browser tests run headless)
+        run: uv run pytest -m "not models and not hardware and not slow" -p no:cacheprovider

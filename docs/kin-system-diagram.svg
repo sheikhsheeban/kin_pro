@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="760" viewBox="0 0 1120 760" role="img" aria-label="Kin system architecture diagram">
+    <defs>
+      <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:#1d2321"/></marker>
+      <marker id="arO" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:#2b5fb3"/></marker>
+      <marker id="arW" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:#a6521b"/></marker>
+      <style>
+        .b{fill:#ffffff;stroke:#b9c2be;stroke-width:1.2}
+        .bk{fill:#e2efea;stroke:#1f6f5c;stroke-width:1.4}
+        .bo{fill:#e4ecf8;stroke:#2b5fb3;stroke-width:1.4}
+        .bw{fill:#f6e8dd;stroke:#a6521b;stroke-width:1.4}
+        .t{font:600 13px 'DejaVu Sans',sans-serif;fill:#1d2321}
+        .s{font:400 10.5px 'DejaVu Sans Mono',monospace;fill:#5d6763}
+        .h{font:500 11px 'DejaVu Sans Mono',monospace;fill:#5d6763;letter-spacing:.08em}
+        .hb{font:600 12px 'DejaVu Sans Mono',monospace;fill:#1f6f5c;letter-spacing:.06em}
+        .ho{font:600 12px 'DejaVu Sans Mono',monospace;fill:#2b5fb3;letter-spacing:.06em}
+        .l{stroke:#1d2321;stroke-width:1.3;fill:none}
+        .lo{stroke:#2b5fb3;stroke-width:1.6;fill:none;stroke-dasharray:6 4}
+        .lw{stroke:#a6521b;stroke-width:1.6;fill:none;stroke-dasharray:5 4}
+      </style>
+    </defs><rect width="1120" height="760" fill="#ffffff"/>
+
+    <!-- device boundary -->
+    <rect x="10" y="30" width="870" height="715" rx="10" style="fill:none;stroke:#1f6f5c;stroke-width:2;stroke-dasharray:10 6"/>
+    <text x="28" y="56" class="hb">ON-DEVICE · RASPBERRY PI 5 (4 GB) · RAW AUDIO NEVER LEAVES THIS BOX</text>
+
+    <!-- column headers -->
+    <text x="32" y="92" class="h">SENSE</text>
+    <text x="242" y="92" class="h">PERCEIVE · always on</text>
+    <text x="452" y="92" class="h">THINK · on demand</text>
+    <text x="682" y="92" class="h">REMEMBER · ACT</text>
+
+    <!-- SENSE -->
+    <rect x="30" y="104" width="180" height="58" rx="6" class="b"/>
+    <text x="42" y="127" class="t">Mic array</text><text x="42" y="146" class="s">2–4 mic USB/I²S, 16 kHz</text>
+
+    <rect x="30" y="186" width="180" height="58" rx="6" class="bw"/>
+    <text x="42" y="209" class="t">Physical mute switch</text><text x="42" y="228" class="s">cuts mic VCC in hardware</text>
+
+    <rect x="30" y="268" width="180" height="58" rx="6" class="bw"/>
+    <text x="42" y="291" class="t">Listening LED</text><text x="42" y="310" class="s">wired to mic power rail</text>
+
+    <rect x="30" y="350" width="180" height="58" rx="6" class="b"/>
+    <text x="42" y="373" class="t">Env sensors (opt.)</text><text x="42" y="392" class="s">lux · temp · presence</text>
+
+    <rect x="30" y="432" width="180" height="58" rx="6" class="b"/>
+    <text x="42" y="455" class="t">Button + speaker</text><text x="42" y="474" class="s">push-to-talk · I²S amp</text>
+
+    <!-- PERCEIVE -->
+    <rect x="240" y="104" width="190" height="58" rx="6" class="b"/>
+    <text x="252" y="127" class="t">RAM ring buffer</text><text x="252" y="146" class="s">30 s PCM · never on disk</text>
+
+    <rect x="240" y="186" width="190" height="58" rx="6" class="b"/>
+    <text x="252" y="209" class="t">Silero VAD</text><text x="252" y="228" class="s">gates everything below</text>
+
+    <rect x="240" y="268" width="190" height="58" rx="6" class="b"/>
+    <text x="252" y="291" class="t">Wake word</text><text x="252" y="310" class="s">openWakeWord "Hey Kin"</text>
+
+    <rect x="240" y="350" width="190" height="58" rx="6" class="bk"/>
+    <text x="252" y="373" class="t">Streaming STT</text><text x="252" y="392" class="s">Moonshine v2 Small/Tiny</text>
+
+    <rect x="240" y="432" width="190" height="58" rx="6" class="b"/>
+    <text x="252" y="455" class="t">Speaker ID (opt.)</text><text x="252" y="474" class="s">owner vs. others, local</text>
+
+    <!-- THINK -->
+    <rect x="450" y="104" width="210" height="58" rx="6" class="b"/>
+    <text x="462" y="127" class="t">Event bus</text><text x="462" y="146" class="s">asyncio queue / ZeroMQ ipc</text>
+
+    <rect x="450" y="186" width="210" height="58" rx="6" class="b"/>
+    <text x="462" y="209" class="t">Orchestrator</text><text x="462" y="228" class="s">state machine + model loader</text>
+
+    <rect x="450" y="268" width="210" height="58" rx="6" class="b"/>
+    <text x="462" y="291" class="t">Intent router</text><text x="462" y="310" class="s">Gemma 3 270M · classify</text>
+
+    <rect x="450" y="350" width="210" height="58" rx="6" class="bk"/>
+    <text x="462" y="373" class="t">Reasoning LLM</text><text x="462" y="392" class="s">Gemma 4 E2B · LiteRT-LM int4</text>
+
+    <rect x="450" y="432" width="210" height="58" rx="6" class="b"/>
+    <text x="462" y="455" class="t">Confidence gate</text><text x="462" y="474" class="s">abstain · ask · offer lookup</text>
+
+    <!-- REMEMBER / ACT -->
+    <rect x="680" y="104" width="180" height="58" rx="6" class="b"/>
+    <text x="692" y="127" class="t">Embedder</text><text x="692" y="146" class="s">EmbeddingGemma 300M</text>
+
+    <rect x="680" y="186" width="180" height="58" rx="6" class="bk"/>
+    <text x="692" y="209" class="t">Memory store</text><text x="692" y="228" class="s">SQLCipher + sqlite-vec</text>
+
+    <rect x="680" y="268" width="180" height="58" rx="6" class="b"/>
+    <text x="692" y="291" class="t">Consolidator</text><text x="692" y="310" class="s">nightly summarise + prune</text>
+
+    <rect x="680" y="350" width="180" height="58" rx="6" class="b"/>
+    <text x="692" y="373" class="t">Local tools</text><text x="692" y="392" class="s">tasks · reminders</text>
+
+    <rect x="680" y="432" width="180" height="58" rx="6" class="b"/>
+    <text x="692" y="455" class="t">Text-to-speech</text><text x="692" y="474" class="s">Piper medium voice</text>
+
+    <!-- bottom band -->
+    <rect x="30" y="560" width="400" height="66" rx="6" class="b"/>
+    <text x="42" y="584" class="t">Privacy dashboard + audit log</text><text x="42" y="604" class="s">local web UI · every egress call listed</text>
+
+    <rect x="450" y="560" width="410" height="66" rx="6" class="bo"/>
+    <text x="462" y="584" class="t">Lookup Gateway (separate process)</text><text x="462" y="604" class="s">enum kinds only · schema-checked params · no transcript</text>
+
+    <rect x="450" y="660" width="410" height="60" rx="6" class="bo"/>
+    <text x="462" y="684" class="t">Egress firewall (nftables)</text><text x="462" y="703" class="s">allowlist 3 hosts · gateway uid only</text>
+
+    <!-- INTERNET -->
+    <text x="912" y="56" class="ho">INTERNET</text>
+    <text x="912" y="74" class="s">factual lookups only</text>
+    <rect x="910" y="520" width="190" height="52" rx="6" class="bo"/><text x="922" y="550" class="t">Weather API</text>
+    <rect x="910" y="590" width="190" height="52" rx="6" class="bo"/><text x="922" y="620" class="t">Web search API</text>
+    <rect x="910" y="660" width="190" height="52" rx="6" class="bo"/><text x="922" y="690" class="t">News API</text>
+
+    <!-- arrows: sense -> perceive -->
+    <path d="M210 133 H238" class="l" marker-end="url(#ar)"/>
+    <path d="M120 186 V164" class="lw" marker-end="url(#arW)"/>
+    <path d="M120 244 V266" class="lw" marker-end="url(#arW)"/>
+    <!-- perceive chain -->
+    <path d="M335 162 V184" class="l" marker-end="url(#ar)"/>
+    <path d="M335 244 V266" class="l" marker-end="url(#ar)"/>
+    <path d="M335 326 V348" class="l" marker-end="url(#ar)"/>
+    <path d="M335 408 V430" class="l" marker-end="url(#ar)"/>
+    <!-- STT -> event bus -->
+    <path d="M430 379 H440 V133 H448" class="l" marker-end="url(#ar)"/>
+    <!-- think chain -->
+    <path d="M555 162 V184" class="l" marker-end="url(#ar)"/>
+    <path d="M555 244 V266" class="l" marker-end="url(#ar)"/>
+    <path d="M555 326 V348" class="l" marker-end="url(#ar)"/>
+    <path d="M555 408 V430" class="l" marker-end="url(#ar)"/>
+    <!-- bus -> embedder (passive memory capture) -->
+    <path d="M660 133 H678" class="l" marker-end="url(#ar)"/>
+    <path d="M770 162 V184" class="l" marker-end="url(#ar)"/>
+    <path d="M770 244 V266" class="l" marker-end="url(#ar)" />
+    <!-- LLM <-> memory (RAG) -->
+    <path d="M660 372 H668 V222 H678" class="l" marker-end="url(#ar)"/>
+    <!-- LLM -> tools -->
+    <path d="M660 386 H678" class="l" marker-end="url(#ar)"/>
+    <!-- gate -> TTS -->
+    <path d="M660 461 H678" class="l" marker-end="url(#ar)"/>
+    <!-- TTS -> speaker -->
+    <path d="M770 490 V530 H120 V492" class="l" marker-end="url(#ar)"/>
+    <!-- LLM tool call -> gateway -->
+    <path d="M610 490 V558" class="lo" marker-end="url(#arO)"/>
+    <path d="M500 558 V492" class="lo" marker-end="url(#arO)"/>
+    <text x="618" y="550" class="s" style="fill:#2b5fb3">lookup(kind, params)</text>
+    <text x="368" y="546" class="s" style="fill:#2b5fb3">facts ↑</text>
+    <!-- gateway -> firewall -> internet -->
+    <path d="M655 626 V658" class="lo" marker-end="url(#arO)"/>
+    <path d="M860 690 H884 V546 H908" class="lo" marker-end="url(#arO)"/>
+    <path d="M884 616 H908" class="lo" marker-end="url(#arO)"/>
+    <path d="M884 686 H908" class="lo" marker-end="url(#arO)"/>
+    <!-- gateway -> audit -->
+    <path d="M450 593 H432" class="l" marker-end="url(#ar)"/>
+  </svg>

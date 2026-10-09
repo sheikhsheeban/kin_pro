@@ -1,0 +1,172 @@
+# HELD-OUT TEST questions for the recall benchmark (Prompt 5). Same format as questions.yaml.
+# Written after Prompts 3-5 were tuned on questions.yaml (the dev set) and never used for tuning.
+# All asked on Mon 5 Oct 2026 at 09:00. Lines x.40-x.45 of week.txt were added for these.
+
+questions:
+  # --- single fact ---------------------------------------------------------------------------------
+  - {id: S20, cat: single_fact, q: "When are the expense reports due?", expect: [["15"]], support: ["1.40"], answer: "On the 15th."}
+  - {id: S21, cat: single_fact, q: "Where are the tennis courts?", expect: [[seminary hills]], support: ["1.44"], answer: "The club courts near Seminary Hills."}
+  - {id: S22, cat: single_fact, q: "How old is Karan's daughter?", expect: [["5"]], support: ["1.45"], answer: "Five."}
+  - {id: S23, cat: single_fact, q: "What is the book club reading?", expect: [[midnight library]], support: ["2.43"], answer: "The Midnight Library."}
+  - {id: S24, cat: single_fact, q: "Where is Imran moving jobs to?", expect: [[infosys]], support: ["2.44"], answer: "Infosys."}
+  - {id: S25, cat: single_fact, q: "Where is the car being serviced?", expect: [[maruti]], support: ["3.40"], answer: "At the Maruti workshop."}
+  - {id: S26, cat: single_fact, q: "What is Meera allergic to?", expect: [[shellfish]], support: ["3.43"], answer: "Shellfish."}
+  - {id: S27, cat: single_fact, q: "When is Ananya's birthday?", expect: [["3"], [december]], support: ["4.45"], answer: "3 December."}
+  - {id: S28, cat: single_fact, q: "What does Nisha do?", expect: [[teacher]], support: ["5.44"], answer: "She's a teacher at Bishop Cotton School."}
+  - {id: S29, cat: single_fact, q: "When is Meera's half marathon?", expect: [["25"], [october]], support: ["6.41"], answer: "25 October."}
+  - {id: S30, cat: single_fact, q: "Where is Imran's new office?", expect: [[hinjewadi]], support: ["7.44"], answer: "Hinjewadi, Pune."}
+  - {id: S31, cat: single_fact, q: "What's the next book for the book club?", expect: [[sapiens]], support: ["7.41"], answer: "Sapiens."}
+  - {id: S32, cat: single_fact, q: "What does Kavya want to start next year?", expect: [[cardiology, residency]], support: ["6.17"], answer: "A cardiology residency."}
+  - {id: S33, cat: single_fact, q: "When does my new laptop arrive?", expect: [[thursday, "8"]], support: ["4.06"], answer: "Thursday 8 October."}
+  - {id: S34, cat: single_fact, q: "Which club did I decide to join?", expect: [[badminton]], support: ["7.20"], answer: "The badminton club, Wednesday nights."}
+
+  # --- name / number / code lookup -----------------------------------------------------------------
+  - {id: N17, cat: lookup, q: "What's Divya's new number?", expect: [["97300 55821", "9730055821"]], support: ["3.44"], answer: "97300 55821."}
+  - {id: N18, cat: lookup, q: "What's the office parking permit number?", expect: [["7731"]], support: ["5.41"], answer: "7731."}
+  - {id: N19, cat: lookup, q: "How much did the gym membership cost?", expect: [["7500"]], support: ["7.40"], answer: "7,500 rupees."}
+  - {id: N20, cat: lookup, q: "How long is my gym membership for?", expect: [["6"], [month]], support: ["7.40"], answer: "Six months."}
+  - {id: N21, cat: lookup, q: "What's the name of Karan's daughter?", expect: [[tara]], support: ["1.45"], answer: "Tara."}
+  - {id: N22, cat: lookup, q: "What's Karan's wife called?", expect: [[nisha]], support: ["5.44"], answer: "Nisha."}
+  - {id: N23, cat: lookup, q: "Which school does Nisha teach at?", expect: [[bishop cotton]], support: ["5.44"], answer: "Bishop Cotton School."}
+  - {id: N24, cat: lookup, q: "How much was the double charge on my card?", expect: [["2499"]], support: ["6.15"], answer: "2,499 rupees."}
+  - {id: N25, cat: lookup, q: "Which seats did I book on the Lonavala train?", expect: [["41"], ["42"]], support: ["5.15"], answer: "Seats 41 and 42, coach B2."}
+  - {id: N26, cat: lookup, q: "What's the code for my gym locker?", expect: [["4471"]], support: ["1.03"], answer: "4471."}
+  - {id: N27, cat: lookup, q: "How much is the rent going to be?", expect: [["18500"]], support: ["3.03"], answer: "18,500 rupees from November."}
+  - {id: N28, cat: lookup, q: "What number do I call for my bank's customer care?", expect: [["1800 202 6161", "18002026161"]], support: ["7.13"], answer: "1800 202 6161."}
+  - {id: N29, cat: lookup, q: "How much did I pay for electricity this month?", expect: [["1850"]], support: ["1.20"], answer: "1,850 rupees."}
+  - {id: N30, cat: lookup, q: "What's the password for Netflix?", expect: [[bluefin88]], support: ["5.10"], answer: "bluefin88."}
+  - {id: N31, cat: lookup, q: "What's the password of the home wifi?", expect: [[mangotree77]], support: ["6.11"], answer: "MangoTree77."}
+  - {id: N32, cat: lookup, q: "What did the plumber charge me?", expect: [["900"]], support: ["2.17"], answer: "900 rupees."}
+
+  # --- time-scoped (now = Mon 5 Oct, 09:00) -----------------------------------------------------------
+  - {id: T11, cat: time_scoped, q: "What did I plan last Monday?", expect: [[mentoring, draft, tennis, expense]], support: ["1.09", "1.11", "1.42", "1.40"], answer: "Mentoring every Thursday at 3, the draft by Wednesday, tennis with Karan."}
+  - {id: T12, cat: time_scoped, q: "What did Imran tell me on Tuesday?", expect: [[infosys, switching]], support: ["2.44"], answer: "He's switching jobs to Infosys next month."}
+  - {id: T13, cat: time_scoped, q: "What changed about the book club on Friday?", expect: [[saturday]], support: ["5.40"], answer: "It moved to Saturday at 6."}
+  - {id: T14, cat: time_scoped, q: "What did I book on Wednesday?", expect: [[car service, maruti, service]], support: ["3.40"], answer: "The car service at the Maruti workshop."}
+  - {id: T15, cat: time_scoped, q: "What did the pharmacy say on Thursday?", expect: [[saturday, delayed]], support: ["4.40"], answer: "The prescription is delayed to Saturday."}
+  - {id: T16, cat: time_scoped, q: "What did I spend money on yesterday?", expect: [[gym, "7500", rahul, "1600", groceries]], support: ["7.40", "7.09"], answer: "Gym membership 7,500; 1,600 to Rahul for groceries."}
+  - {id: T17, cat: time_scoped, q: "What happened with the car service on Saturday?", expect: [[monday]], support: ["6.40"], answer: "It moved to Monday at 10."}
+  - {id: T18, cat: time_scoped, q: "What did Meera tell me on Wednesday?", expect: [[shellfish]], support: ["3.43"], answer: "She's allergic to shellfish."}
+  - {id: T19, cat: time_scoped, q: "What did I decide yesterday?", expect: [[badminton]], support: ["7.20"], answer: "To join the badminton club on Wednesday nights."}
+  - {id: T20, cat: time_scoped, q: "What's happening on Tuesday?", expect: [[orion, demo, water, lunch]], support: ["2.08", "7.07", "4.41"], answer: "The Orion demo at 10, water off 10-2, lunch with Imran."}
+  - {id: T21, cat: time_scoped, q: "What do I have on Saturday?", expect: [[farewell, tennis, shobha]], support: ["7.11", "7.43", "5.03"], answer: "Priya's farewell dinner, tennis at 8 am, Aunty Shobha arrives."}
+  - {id: T22, cat: time_scoped, q: "What's on tomorrow?", expect: [[orion, demo, water, lunch]], support: ["2.08", "7.07", "4.41"], answer: "The Orion demo, the water cut, lunch with Imran."}
+  - {id: T23, cat: time_scoped, q: "What did Rahul tell me on Saturday?", expect: [[electrician, kavya, train]], support: ["6.43", "6.12"], answer: "The electrician comes Monday around 9; Kavya's train is Sunday at 7 pm."}
+  - {id: T24, cat: time_scoped, q: "What did I note about Karan last Monday?", expect: [[tara, daughter, tennis]], support: ["1.45", "1.42"], answer: "His daughter Tara turned five; tennis on Thursday."}
+  - {id: T25, cat: time_scoped, q: "What did I buy last week?", expect: [[groceries, dmart, train, gym]], support: ["4.17", "5.15", "7.40"], answer: "Groceries at DMart, the Lonavala train, the gym membership."}
+  - {id: T26, cat: time_scoped, q: "What got moved on Friday?", expect: [[book club, lunch, barbeque, dentist]], support: ["5.40", "5.42", "5.02"], answer: "The book club, lunch with Imran, the dentist appointment."}
+  - {id: T27, cat: time_scoped, q: "What did I learn about Imran last week?", expect: [[infosys, hinjewadi]], support: ["2.44", "7.44"], answer: "He's moving to Infosys; his new office is in Hinjewadi."}
+  - {id: T28, cat: time_scoped, q: "What changed about tennis on Wednesday?", expect: [[friday]], support: ["3.41"], answer: "It moved to Friday at 7."}
+  - {id: T29, cat: time_scoped, q: "What did I note on Sunday?", expect: [[gym, sapiens, tennis, hinjewadi, badminton]], support: ["7.40", "7.41", "7.43", "7.44", "7.20"], answer: "Gym renewed, Sapiens next, tennis moved, Imran's office, badminton."}
+  - {id: T30, cat: time_scoped, q: "What's happening this weekend?", expect: [[farewell, tennis, shobha]], support: ["7.11", "7.43", "5.03"], answer: "Priya's farewell dinner and tennis on Saturday; Aunty Shobha arrives."}
+  - {id: T31, cat: time_scoped, q: "What did Priya say on Saturday?", expect: [[farewell, dinner]], support: ["6.07", "6.09"], answer: "A farewell dinner next Saturday at Barbeque Nation."}
+  - {id: T32, cat: time_scoped, q: "What did I hear about the water supply yesterday?", expect: [[tuesday]], support: ["7.07"], answer: "Off on Tuesday from 10 to 2."}
+
+  # --- latest version -----------------------------------------------------------------------------------
+  - {id: V08, cat: latest_version, q: "When is the book club?", expect: [[saturday], ["6"]], forbid: [friday], support: ["2.41", "5.40"], answer: "Saturday at 6 (moved from Friday)."}
+  - {id: V09, cat: latest_version, q: "When am I playing tennis with Karan?", expect: [[saturday], ["8"]], forbid: [thursday], support: ["1.42", "3.41", "7.43"], answer: "Saturday the 10th at 8 am."}
+  - {id: V10, cat: latest_version, q: "When will my prescription be ready?", expect: [[saturday]], forbid: [thursday], support: ["2.40", "4.40"], answer: "Saturday (delayed from Thursday)."}
+  - {id: V11, cat: latest_version, q: "When is the car service?", expect: [[monday], ["10"]], forbid: ["saturday at 9"], support: ["3.40", "6.40"], answer: "Monday at 10."}
+  - {id: V12, cat: latest_version, q: "Where am I having lunch with Imran?", expect: [[barbeque nation]], forbid: [haldiram], support: ["4.43", "5.42"], answer: "Barbeque Nation (Haldiram's was full)."}
+  - {id: V13, cat: latest_version, q: "Which day is lunch with Imran?", expect: [[tuesday]], support: ["4.41"], answer: "Tuesday."}
+  - {id: V14, cat: latest_version, q: "What time is Priya's farewell dinner now?", expect: [["8:30", "8.30", "830", "half past 8"]], support: ["7.11"], answer: "8:30."}
+  - {id: V15, cat: latest_version, q: "Has my dentist appointment changed?", expect: [[wednesday], ["6"]], support: ["5.02"], answer: "Yes, now Wednesday at 6 pm."}
+  - {id: V16, cat: latest_version, q: "When is the quarterly review now?", expect: [[tuesday, "13"]], forbid: ["monday"], support: ["7.18"], answer: "Tuesday the 13th at 3 pm."}
+  - {id: V17, cat: latest_version, q: "Did Sam give my umbrella back?", expect: [[yes, return, back, gave]], support: ["6.05"], answer: "Yes, on Saturday."}
+  - {id: V18, cat: latest_version, q: "Is tennis still on Thursday?", expect: [[saturday]], support: ["7.43"], answer: "No, it's now Saturday at 8 am."}
+  - {id: V19, cat: latest_version, q: "When is my next session with Priyanka?", expect: [[friday], ["4"]], support: ["4.13"], answer: "Friday at 4."}
+  - {id: V20, cat: latest_version, q: "What time did Priya move our Wednesday meeting to?", expect: [["5"]], support: ["3.07"], answer: "5."}
+  - {id: V21, cat: latest_version, q: "Where and when is the car service?", expect: [[maruti], [monday]], support: ["3.40", "6.40"], answer: "Maruti workshop, Monday at 10."}
+  - {id: V22, cat: latest_version, q: "When is the Orion client demo?", expect: [[tuesday, "6"], ["10"]], support: ["2.08"], answer: "Tuesday 6 October at 10."}
+  - {id: V23, cat: latest_version, q: "Is the book club still on Friday?", expect: [[saturday]], support: ["5.40"], answer: "No, Saturday at 6."}
+  - {id: V24, cat: latest_version, q: "When is the prescription ready after the delay?", expect: [[saturday]], support: ["4.40"], answer: "Saturday."}
+  - {id: V25, cat: latest_version, q: "What day is tennis with Karan now?", expect: [[saturday]], support: ["7.43"], answer: "Saturday."}
+  - {id: V26, cat: latest_version, q: "What's the latest time for the quarterly review?", expect: [["3"]], support: ["7.18"], answer: "3 pm on Tuesday the 13th."}
+  - {id: V27, cat: latest_version, q: "Where is lunch with Imran now?", expect: [[barbeque nation]], forbid: [haldiram], support: ["5.42"], answer: "Barbeque Nation."}
+  - {id: V28, cat: latest_version, q: "When is my car going to the workshop?", expect: [[monday]], support: ["6.40"], answer: "Monday at 10."}
+  - {id: V29, cat: latest_version, q: "What time was I meeting Priya at the library cafe?", expect: [["5"]], support: ["2.05", "3.07"], answer: "5 (moved from 4)."}
+  - {id: V30, cat: latest_version, q: "What's the final plan for Priya's farewell dinner?", expect: [["8:30", "8.30", "830", "half past 8"]], support: ["7.11", "6.09"], answer: "Saturday at 8:30 at Barbeque Nation."}
+
+  # --- who said what (answerable: the words name the person) -------------------------------------------
+  - {id: W12, cat: who_said, q: "Who said the expense reports are due on the 15th?", expect: [[meera]], support: ["1.40"], answer: "Meera from accounts."}
+  - {id: W13, cat: who_said, q: "Who is allergic to shellfish?", expect: [[meera]], forbid: ["you are allergic", "you're allergic"], support: ["3.43"], answer: "Meera."}
+  - {id: W14, cat: who_said, q: "Who is switching jobs to Infosys?", expect: [[imran]], forbid: ["you are switching", "you're switching"], support: ["2.44"], answer: "Imran."}
+  - {id: W15, cat: who_said, q: "Who is running the half marathon?", expect: [[meera]], forbid: ["you are running", "you're running"], support: ["6.41"], answer: "Meera."}
+  - {id: W16, cat: who_said, q: "Who teaches at Bishop Cotton School?", expect: [[nisha]], support: ["5.44"], answer: "Nisha, Karan's wife."}
+  - {id: W17, cat: who_said, q: "Who just turned five?", expect: [[tara]], support: ["1.45"], answer: "Tara, Karan's daughter."}
+  - {id: W18, cat: who_said, q: "Who told me about next month's book club book?", expect: [[divya]], support: ["7.41"], answer: "Divya."}
+  - {id: W19, cat: who_said, q: "Who said lunch moved to Barbeque Nation?", expect: [[imran]], support: ["5.42"], answer: "Imran."}
+  - {id: W20, cat: who_said, q: "Who has a new office in Hinjewadi?", expect: [[imran]], support: ["7.44"], answer: "Imran."}
+  - {id: W21, cat: who_said, q: "Who is my manager?", expect: [[arjun]], support: ["7.22"], answer: "Arjun."}
+  - {id: W22, cat: who_said, q: "Who is Rahul's sister?", expect: [[kavya]], support: ["2.11"], answer: "Kavya."}
+  - {id: W23, cat: who_said, q: "Who is getting married in Pune?", expect: [[anil]], support: ["1.22"], answer: "Your cousin Anil."}
+  - {id: W24, cat: who_said, q: "Who called about my dentist appointment?", expect: [[mehta, clinic]], support: ["5.02"], answer: "Dr Mehta's clinic."}
+  - {id: W25, cat: who_said, q: "Who did I lend my umbrella to?", expect: [[sam]], support: ["2.15"], answer: "Sam."}
+  - {id: W26, cat: who_said, q: "Who wants the Orion demo slides?", expect: [[arjun]], support: ["7.22"], answer: "Arjun, your manager."}
+  - {id: W27, cat: who_said, q: "Who got into a master's at Edinburgh?", expect: [[ananya, sister]], support: ["2.25"], answer: "Your sister Ananya."}
+  - {id: W28, cat: who_said, q: "Who is a doctor at AIIMS Delhi?", expect: [[kavya]], support: ["6.04"], answer: "Kavya."}
+  - {id: W29, cat: who_said, q: "Who is going to be my mentor?", expect: [[priyanka]], support: ["1.06"], answer: "Priyanka."}
+  - {id: W30, cat: who_said, q: "Who said the water will be off on Tuesday?", expect: [[landlord]], support: ["7.07"], answer: "The landlord."}
+
+  # --- multi-fact --------------------------------------------------------------------------------------
+  - {id: M09, cat: multi_fact, q: "What do I know about Karan?", expect: [[tennis], [tara, daughter], [nisha, wife]], min: 2, support: ["1.42", "1.45", "5.44"], answer: "Tennis plans, daughter Tara turned five, wife Nisha is a teacher."}
+  - {id: M10, cat: multi_fact, q: "What do I know about Imran?", expect: [[infosys], [hinjewadi], [lunch]], min: 2, support: ["2.44", "7.44", "4.41"], answer: "Moving to Infosys, new office in Hinjewadi, lunch on Tuesday."}
+  - {id: M11, cat: multi_fact, q: "What do I know about Meera?", expect: [[expense], [shellfish], [marathon]], min: 2, support: ["1.40", "3.43", "6.41"], answer: "Expense reports due on the 15th, allergic to shellfish, half marathon on the 25th."}
+  - {id: M12, cat: multi_fact, q: "What do I know about Divya?", expect: [[book club], ["97300"], [sapiens]], min: 2, support: ["2.41", "3.44", "7.41"], answer: "Hosts the book club, new number, Sapiens next."}
+  - {id: M13, cat: multi_fact, q: "Tell me about the book club.", expect: [[saturday, friday], [midnight library], [sapiens], [divya]], min: 2, support: ["2.41", "2.43", "5.40", "7.41"], answer: "Saturday at 6 at Divya's, reading The Midnight Library, Sapiens next."}
+  - {id: M14, cat: multi_fact, q: "What's going on with my car?", expect: [[service, maruti], [monday], [insurance, "14200"]], min: 2, support: ["3.40", "6.40", "5.07"], answer: "Service moved to Monday at 10; insurance renewal 14,200."}
+  - {id: M15, cat: multi_fact, q: "What have I spent money on recently?", expect: [[electricity, "1850"], [plumber, "900"], [dmart, "3200"], [gym, "7500"]], min: 2, support: ["1.20", "2.17", "4.17", "7.40"], answer: "Electricity, plumber, groceries at DMart, gym membership."}
+  - {id: M16, cat: multi_fact, q: "Tell me about Ananya.", expect: [[edinburgh], [january, flight], [december, birthday]], min: 2, support: ["2.25", "5.11", "4.45"], answer: "Master's at Edinburgh, flies 5 January, birthday 3 December."}
+  - {id: M17, cat: multi_fact, q: "What do I know about Priyanka?", expect: [[mentor], [data scientist], [iit], [friday, session]], min: 2, support: ["1.06", "1.07", "4.11", "4.13"], answer: "Mentor, senior data scientist, IIT Bombay, session moved to Friday."}
+  - {id: M18, cat: multi_fact, q: "What do I know about Neha?", expect: [["2314", extension], [quarterly review, review]], min: 2, support: ["2.09", "7.18"], answer: "Extension 2314; told you about the quarterly review."}
+  - {id: M19, cat: multi_fact, q: "What do I know about Arjun?", expect: [[manager], [slides, orion]], min: 2, support: ["7.22"], answer: "Your manager; wants the Orion slides by Monday noon."}
+  - {id: M20, cat: multi_fact, q: "What plans do I have next week?", expect: [[review], [offsite, lonavala]], min: 2, support: ["7.18", "3.12"], answer: "Quarterly review Tuesday 13th; offsite in Lonavala 16-17."}
+  - {id: M21, cat: multi_fact, q: "What are my plans this week?", expect: [[orion], [dentist], [farewell], [tennis], [laptop], [lunch]], min: 2, support: ["2.08", "5.02", "7.11", "7.43", "4.06", "4.41"], answer: "Orion demo, dentist, farewell dinner, tennis, laptop arrives, lunch with Imran."}
+  - {id: M22, cat: multi_fact, q: "What do I know about my dad?", expect: [[birthday, "9"], [dinner], [gift]], min: 2, support: ["1.24", "7.03", "7.02"], answer: "Birthday on the 9th, family dinner at 8, buy a gift."}
+  - {id: M23, cat: multi_fact, q: "What do I know about Kavya's visit?", expect: [[two nights, "2 nights", saturday], [train], [charger]], min: 2, support: ["2.13", "6.12", "7.16"], answer: "Two nights; train back Sunday at 7 pm; left her charger."}
+  - {id: M24, cat: multi_fact, q: "What things do I need to do?", expect: [[bank], [passport], [charger, courier], [gift], [slides]], min: 2, support: ["6.15", "3.14", "7.16", "7.02", "7.22"], answer: "Call the bank, renew the passport, courier the charger, buy Dad's gift, the Orion slides."}
+  - {id: M25, cat: multi_fact, q: "What passwords and codes do I have?", expect: [["4471"], [saffron2026], [mangotree77], [bluefin88], ["7731"]], min: 2, support: ["1.03", "1.17", "6.11", "5.10", "5.41"], answer: "Locker 4471, office wifi, home wifi, Netflix, parking permit."}
+  - {id: M26, cat: multi_fact, q: "What did Mum tell me about?", expect: [[anil, wedding], [shobha], [dinner, birthday]], min: 2, support: ["1.22", "5.03", "1.24"], answer: "Anil's wedding, Aunty Shobha's visit, Dad's birthday."}
+  - {id: M27, cat: multi_fact, q: "What have I heard about Lonavala?", expect: [[offsite], [train, b2]], min: 2, support: ["3.12", "5.15"], answer: "The team offsite there; the train is booked."}
+  - {id: M28, cat: multi_fact, q: "What do I know about Priya's move?", expect: [[bangalore], [december], [farewell]], min: 2, support: ["3.18", "6.07"], answer: "Bangalore in December; farewell dinner first."}
+  - {id: M29, cat: multi_fact, q: "Tell me about the quarterly review.", expect: [[tuesday, "13"], ["3"], [neha]], min: 2, support: ["7.18"], answer: "Tuesday the 13th at 3 pm, from Neha."}
+
+  # --- conversation split over short lines ------------------------------------------------------------
+  - {id: C08, cat: split, q: "Where are we playing tennis?", expect: [[seminary hills]], support: ["1.44"], answer: "The club courts near Seminary Hills."}
+  - {id: C09, cat: split, q: "Which book is the book club reading?", expect: [[midnight library]], support: ["2.43"], answer: "The Midnight Library."}
+  - {id: C10, cat: split, q: "Which restaurant did Imran first suggest?", expect: [[haldiram]], support: ["4.43"], answer: "Haldiram's on Wardha Road."}
+  - {id: C11, cat: split, q: "What time is the electrician coming?", expect: [["9"]], support: ["6.45"], answer: "Around 9."}
+  - {id: C12, cat: split, q: "When is the electrician coming?", expect: [[monday]], support: ["6.43"], answer: "Monday morning, around 9."}
+  - {id: C13, cat: split, q: "Where did Priya want to meet?", expect: [[library]], support: ["2.05"], answer: "The library cafe."}
+  - {id: C14, cat: split, q: "Where is Priya's farewell dinner being held?", expect: [[barbeque nation, sitabuldi]], support: ["6.09"], answer: "Barbeque Nation in Sitabuldi."}
+  - {id: C15, cat: split, q: "How long is Kavya staying with us?", expect: [[two nights, "2 nights", saturday, weekend]], support: ["2.13"], answer: "Two nights."}
+  - {id: C16, cat: split, q: "Since when is Rahul vegan?", expect: [[last month, documentary]], support: ["1.15"], answer: "Since last month."}
+  - {id: C17, cat: split, q: "Why did Rahul go vegan?", expect: [[documentary]], support: ["1.15"], answer: "After a documentary."}
+  - {id: C18, cat: split, q: "How long will Aunty Shobha stay?", expect: [[week]], support: ["5.05"], answer: "About a week."}
+  - {id: C19, cat: split, q: "Why does Ananya need a lift to the airport?", expect: [[flight, edinburgh]], support: ["5.11", "5.12"], answer: "Her flight to Edinburgh on 5 January."}
+  - {id: C20, cat: split, q: "When do classes start for Ananya?", expect: [["12"], [january]], support: ["2.21"], answer: "12 January."}
+  - {id: C21, cat: split, q: "Which account do I pay the rent to?", expect: [[same account]], support: ["3.05"], answer: "The same account as always."}
+  - {id: C22, cat: split, q: "By when do I have to pay the rent?", expect: [["5"]], support: ["3.05"], answer: "Before the 5th."}
+  - {id: C23, cat: split, q: "What time does Ananya's flight leave?", expect: [["6"]], support: ["5.12"], answer: "6 in the morning."}
+  - {id: C24, cat: split, q: "Which day did Imran suggest for lunch?", expect: [[tuesday]], support: ["4.41"], answer: "Tuesday."}
+  - {id: C25, cat: split, q: "What time is lunch with Imran?", expect: [["1"]], support: ["4.43"], answer: "1 pm."}
+  - {id: C26, cat: split, q: "Where does the book club meet?", expect: [[divya]], accept_abstain: true, support: ["2.41"], answer: "At Divya's place."}
+  - {id: C27, cat: split, q: "Who is driving Ananya to the airport?", expect: [[you]], support: ["5.13"], answer: "You are."}
+  - {id: C28, cat: split, q: "What sport am I playing with Karan?", expect: [[tennis]], support: ["1.42"], answer: "Tennis."}
+  - {id: C29, cat: split, q: "How many nights is Rahul's sister staying?", expect: [[two, "2"]], support: ["2.13"], answer: "Two nights."}
+
+  # --- must abstain ------------------------------------------------------------------------------------
+  - {id: A19, cat: abstain, q: "When is Imran's birthday?", abstain: true}
+  - {id: A20, cat: abstain, q: "What is Meera's phone number?", abstain: true}
+  - {id: A21, cat: abstain, q: "How much did the electrician charge?", abstain: true}
+  - {id: A22, cat: abstain, q: "Where does Karan live?", abstain: true}
+  - {id: A23, cat: abstain, q: "What's the wifi password at the gym?", abstain: true}
+  - {id: A24, cat: abstain, q: "How much does the car service cost?", abstain: true}
+  - {id: A25, cat: abstain, q: "What's Divya's address?", abstain: true}
+  - {id: A26, cat: abstain, q: "When is Nisha's birthday?", abstain: true}
+  - {id: A27, cat: abstain, q: "What medicine is my prescription for?", abstain: true}
+  - {id: A28, cat: abstain, q: "Who won the tennis match?", abstain: true}
+  - {id: A29, cat: abstain, q: "What's the name of Imran's new manager?", abstain: true}
+  - {id: A30, cat: abstain, q: "How much does the half marathon entry cost?", abstain: true}
+  - {id: A31, cat: abstain, q: "What's my sister's phone number?", abstain: true}
+  - {id: A32, cat: abstain, q: "What is the name of Sam's landlord?", abstain: true}

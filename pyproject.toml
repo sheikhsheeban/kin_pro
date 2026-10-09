@@ -1,0 +1,73 @@
+[project]
+name = "kin"
+version = "0.1.0"
+description = "Kin - a private, always-listening personal AI companion (on-device)"
+requires-python = ">=3.11"
+dependencies = [
+    "dateparser>=1.4.3",
+    "fastapi>=0.142.2",
+    "litert-lm-api>=0.17.1",
+    "moonshine-voice>=0.1.5",
+    "numpy>=2.4.6",
+    "onnxruntime>=1.30.0",
+    "openwakeword>=0.6.0",
+    "piper-tts>=1.8.0",
+    "psutil>=7.2.2",
+    "pydantic>=2.13.5",
+    "pyyaml>=6.0.3",
+    "rapidfuzz>=3.14.6",
+    "sounddevice>=0.5.6",
+    "sqlcipher3>=0.6.2",
+    "sqlite-vec>=0.1.9",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[project.optional-dependencies]
+# GGUF fallback LLM backend. CPU wheels come from the llama-cpp-python index (no compiler needed).
+fallback = [
+  "llama-cpp-python==0.3.19; sys_platform == 'win32'",  # newest prebuilt Windows CPU wheel
+  "llama-cpp-python>=0.3.19; sys_platform != 'win32'",
+]
+
+[[tool.uv.index]]
+name = "llama-cpp-cpu"
+url = "https://abetlen.github.io/llama-cpp-python/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+llama-cpp-python = { index = "llama-cpp-cpu" }
+
+[project.scripts]
+kin = "kin.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["kin"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = [
+  "ignore::DeprecationWarning:fastapi.testclient",
+  "ignore:Using `httpx` with `starlette.testclient`",
+  "ignore::pytest.PytestUnraisableExceptionWarning",
+]
+markers = [
+  "models: needs the downloaded models in ./models",
+  "hardware: needs a real microphone",
+  "slow: takes minutes (real LLM over many queries)",
+  "browser: drives the UI in headless Chromium (Playwright)",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "playwright>=1.63.0",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "pytest-timeout>=2.4.0",
+]

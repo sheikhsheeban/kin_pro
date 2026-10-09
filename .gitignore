@@ -1,0 +1,65 @@
+# Python environments and bytecode
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Test, coverage, and tool caches
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.pyright/
+.tox/
+.nox/
+.cache/
+.ipynb_checkpoints/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.key
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Downloaded model weights and local runtime data
+models/
+data/
+demo/data/
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite-*
+*.sqlite3-*
+*.kinbak
+
+# Interrupted downloads, restores, and editor temporary files
+*.part
+*.restoring
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Generated evaluation output (keep benchmark fixtures and source)
+tests/eval/results/
+
+# Logs and OS-generated files
+*.log
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE-generated state (keep project-level .vscode settings trackable)
+.idea/
+.vscode-test/

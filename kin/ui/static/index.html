@@ -1,0 +1,908 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kin</title>
+<style>
+  :root {
+    --bg: #f4f5f3; --panel: #ffffff; --ink: #1d2321; --muted: #67716d; --line: #dfe3e0;
+    --accent: #1f6f5c; --accent-soft: #e2efea; --warn: #a6521b; --warn-soft: #f6e8dd; --online: #2b5fb3; --danger: #b3261e;
+    --led-off: #c9cecb; --led-green: #22c55e; --led-white: #ffffff; --led-amber: #f59e0b; --led-blue: #3b82f6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121514; --panel: #1b1f1d; --ink: #e7ebe9; --muted: #98a29e; --line: #2c3330;
+      --accent: #4fb89c; --accent-soft: #1d3029; --warn-soft: #3a2a1f; --led-off: #3a403d;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--line); background: var(--panel); }
+  header h1 { font-size: 17px; margin: 0; letter-spacing: .02em; }
+  header .tag { font: 12px ui-monospace, monospace; color: var(--muted); }
+  header .demo { font: 600 12px system-ui, sans-serif; color: var(--warn); background: var(--warn-soft); padding: 4px 8px; border-radius: 6px; display: flex; align-items: center; gap: 8px; }
+  header .demo[hidden] { display: none; }
+  header .conn { margin-left: auto; font-size: 12px; color: var(--muted); }
+  header .conn.bad { color: var(--danger); }
+  main { display: grid; grid-template-columns: 280px 1fr 360px; gap: 16px; padding: 16px 20px; height: calc(100% - 52px); }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; overflow: auto; }
+  .card h2 { font: 600 11px ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+  .row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); gap: 8px; }
+  .row:last-child { border-bottom: 0; }
+  .row label { font-weight: 500; }
+  .row small { display: block; color: var(--muted); font-size: 12px; font-weight: 400; }
+  .switch { position: relative; width: 44px; height: 24px; flex: none; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch span { position: absolute; inset: 0; background: var(--led-off); border-radius: 24px; transition: .15s; cursor: pointer; }
+  .switch span::before { content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .15s; }
+  .switch input:checked + span { background: var(--accent); }
+  .switch.warn input:checked + span { background: var(--warn); }
+  .switch input:checked + span::before { transform: translateX(20px); }
+  .switch input:disabled + span { opacity: .5; cursor: wait; }
+  .led-wrap { display: flex; align-items: center; gap: 14px; padding: 6px 0 14px; border-bottom: 1px solid var(--line); }
+  .led { width: 34px; height: 34px; border-radius: 50%; background: var(--led-off); border: 2px solid var(--line); flex: none; transition: background .15s, box-shadow .15s; }
+  .led.green { background: var(--led-green); box-shadow: 0 0 14px var(--led-green); }
+  .led.amber { background: var(--led-amber); box-shadow: 0 0 14px var(--led-amber); }
+  .led.blue { background: var(--led-blue); box-shadow: 0 0 14px var(--led-blue); }
+  .led.white_pulse { background: var(--led-white); animation: pulse 1s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 4px #fff; opacity: .55; } 50% { box-shadow: 0 0 22px #fff; opacity: 1; } }
+  .led-text b { display: block; }
+  .led-text span { font: 12px ui-monospace, monospace; color: var(--muted); }
+  .stream.closed { color: var(--danger); }
+  .meter { height: 10px; background: var(--line); border-radius: 6px; overflow: hidden; margin-top: 6px; }
+  .meter i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 60ms linear; }
+  .ptt { width: 100%; margin-top: 14px; padding: 18px 10px; border-radius: 10px; border: 2px solid var(--accent); background: var(--accent-soft); color: var(--ink); font: 600 15px system-ui, sans-serif; cursor: pointer; user-select: none; touch-action: none; }
+  .ptt.held { background: var(--accent); color: #fff; }
+  .ptt:disabled { opacity: .45; cursor: not-allowed; }
+  .hint { color: var(--muted); font-size: 12px; margin-top: 8px; }
+  .legend { display: grid; grid-template-columns: auto 1fr; gap: 4px 8px; font-size: 12px; color: var(--muted); margin-top: 14px; }
+  .legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-top: 4px; border: 1px solid var(--line); }
+  #transcript { display: flex; flex-direction: column; gap: 8px; }
+  .line { padding: 8px 12px; border-radius: 8px; background: var(--bg); border: 1px solid var(--line); max-width: 85%; }
+  .line .meta { font: 11px ui-monospace, monospace; color: var(--muted); margin-bottom: 2px; }
+  .line.partial .text { color: var(--muted); font-style: italic; }
+  .line.query { align-self: flex-end; background: var(--accent-soft); border-color: var(--accent); }
+  .line.stored { border-left: 3px solid var(--accent); }
+  .line .saved { font: 11px ui-monospace, monospace; color: var(--accent); margin-top: 3px; }
+  .reply { align-self: flex-start; max-width: 85%; padding: 10px 12px; border-radius: 8px; background: var(--panel); border: 2px solid var(--accent); }
+  .reply.abstained, .reply.timeout, .reply.error { border-color: var(--warn); }
+  .reply.interrupted { opacity: .6; border-style: dashed; }
+  .reply .meta { font: 11px ui-monospace, monospace; color: var(--muted); margin-bottom: 4px; }
+  .reply .badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .badge { font: 11px ui-monospace, monospace; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent); cursor: pointer; }
+  .badge.warn { background: var(--warn-soft); color: var(--warn); border-color: var(--warn); cursor: default; }
+  .badge.plain { background: transparent; color: var(--muted); border-color: var(--line); cursor: default; }
+  .closest { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .badge.path { background: transparent; color: var(--ink); border-color: var(--muted); cursor: default; }
+  details.why { margin-top: 8px; font-size: 12px; border-top: 1px dashed var(--line); padding-top: 6px; }
+  details.why summary { cursor: pointer; color: var(--accent); font-weight: 600; list-style-position: inside; }
+  details.why .plan { color: var(--muted); margin: 6px 0; }
+  details.why .plan b { color: var(--ink); font-weight: 500; }
+  details.why .decision { margin: 6px 0; }
+  details.why .decision .ok { color: var(--accent); } details.why .decision .no { color: var(--warn); }
+  details.why .scroll { overflow-x: auto; }
+  table.facts { width: 100%; border-collapse: collapse; margin: 4px 0 8px; }
+  table.facts th { text-align: left; font: 600 10px ui-monospace, monospace; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; padding: 3px 4px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  table.facts td { padding: 4px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.facts td.n { font-family: ui-monospace, monospace; white-space: nowrap; color: var(--muted); text-align: right; }
+  table.facts tr.cited td:first-child { border-left: 3px solid var(--accent); }
+  table.facts tr.out td { color: var(--muted); }
+  .why .tag { display: inline-block; font: 10px ui-monospace, monospace; padding: 0 5px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); margin-left: 4px; white-space: nowrap; }
+  .why .tag.used { border-color: var(--accent); color: var(--accent); }
+  .why .tag.warn { border-color: var(--warn); color: var(--warn); }
+  .confirm { align-self: flex-start; max-width: 85%; padding: 10px 12px; border-radius: 8px; background: var(--warn-soft); border: 2px solid var(--warn); }
+  .confirm .meta { font: 11px ui-monospace, monospace; color: var(--warn); margin-bottom: 4px; }
+  .confirm .actions { display: flex; gap: 8px; margin-top: 8px; }
+  .confirm.done { opacity: .7; border-style: dashed; }
+  table.tags { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 14px; }
+  table.tags td { padding: 4px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.tags td.num { font-family: ui-monospace, monospace; white-space: nowrap; color: var(--muted); }
+  .divider { align-self: center; font: 11px ui-monospace, monospace; color: var(--muted); padding: 2px 10px; border: 1px dashed var(--line); border-radius: 999px; }
+  .divider.act { color: var(--accent); border-color: var(--accent); }
+  .empty { color: var(--muted); text-align: center; margin-top: 40px; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+  .tabs button { flex: 1; padding: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--muted); border-radius: 6px; cursor: pointer; font-size: 12px; }
+  .tabs button.on { background: var(--accent-soft); color: var(--ink); border-color: var(--accent); }
+  dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; margin: 0 0 14px; font-size: 13px; }
+  dt { color: var(--muted); }
+  dd { margin: 0; font: 12px ui-monospace, monospace; word-break: break-word; }
+  h3 { font: 600 11px ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 16px 0 8px; }
+  .soon { color: var(--muted); font-size: 13px; }
+  .error { color: var(--danger); font-size: 12px; margin-top: 8px; }
+  .memtools { display: flex; gap: 6px; margin-bottom: 8px; }
+  .memtools input { flex: 1; min-width: 0; padding: 7px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font: inherit; }
+  .btn { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); cursor: pointer; font: 12px system-ui, sans-serif; white-space: nowrap; }
+  .btn.danger { border-color: var(--danger); color: var(--danger); }
+  dialog.kdlg { border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); padding: 18px; width: min(440px, calc(100vw - 32px)); }
+  dialog.kdlg::backdrop { background: rgba(0, 0, 0, .35); }
+  .kdlg h3 { margin: 0 0 10px; font-size: 15px; }
+  .kdlg label { display: block; font-size: 12px; color: var(--muted); margin: 10px 0 4px; }
+  .kdlg input { width: 100%; padding: 7px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font: inherit; }
+  .kdlg .msg { min-height: 18px; font-size: 12px; margin-top: 8px; color: var(--muted); }
+  .kdlg .msg.bad { color: var(--danger); }
+  .kdlg .msg.good { color: var(--accent); }
+  .kdlg .acts { display: flex; gap: 6px; justify-content: flex-end; margin-top: 14px; }
+  .memcount { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .mem { padding: 8px 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; }
+  .mem.flash { animation: flash 1.2s ease-out; }
+  @keyframes flash { from { background: var(--accent-soft); } to { background: transparent; } }
+  .mem .t { font-size: 13px; }
+  .mem .m { grid-column: 1; font: 11px ui-monospace, monospace; color: var(--muted); }
+  .mem button { grid-row: 1 / span 2; grid-column: 2; align-self: center; background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 16px; }
+  .mem button:hover { color: var(--danger); }
+  .mem.old .t { color: var(--muted); text-decoration: line-through; }
+  .mem .ev { grid-column: 1 / span 2; font-size: 12px; color: var(--muted); border-left: 2px solid var(--line); padding-left: 8px; }
+  .mem .acts { grid-column: 1; display: flex; flex-wrap: wrap; gap: 8px; font: 11px ui-monospace, monospace; }
+  .mem .acts a { color: var(--accent); cursor: pointer; }
+  .mem.pinned { border-left: 3px solid var(--accent); padding-left: 6px; }
+  .mem.retracted .t { color: var(--warn); text-decoration: line-through; }
+  .mem .other { color: var(--warn); }
+  .review { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; font-size: 12px; }
+  .review b { font-size: 12px; }
+  .review ul { margin: 4px 0 0; padding-left: 18px; }
+  .review .chg { color: var(--muted); }
+  .mem a { color: var(--accent); cursor: pointer; }
+  .people { margin-top: 14px; }
+  .person { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .person .al { font: 11px ui-monospace, monospace; color: var(--muted); }
+  .person button { background: none; border: 0; color: var(--muted); cursor: pointer; }
+  .net { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 12px; }
+  .net .head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+  .net .kind { font: 600 11px ui-monospace, monospace; text-transform: uppercase; color: var(--online); }
+  .net .st { font: 11px ui-monospace, monospace; padding: 1px 6px; border-radius: 999px; border: 1px solid var(--line); }
+  .net .st.ok { color: var(--accent); border-color: var(--accent); }
+  .net .st.refused, .net .st.error { color: var(--warn); border-color: var(--warn); }
+  .net code { display: block; font: 11px ui-monospace, monospace; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 6px; margin-top: 4px; white-space: pre-wrap; word-break: break-all; }
+  .net .meta { color: var(--muted); font: 11px ui-monospace, monospace; }
+  .badge.online { background: #e4ecf8; color: var(--online); border-color: var(--online); cursor: default; }
+  .announce { align-self: center; padding: 8px 14px; border-radius: 999px; border: 2px solid var(--warn); background: var(--warn-soft); font-weight: 500; }
+  .bar { height: 12px; background: var(--line); border-radius: 6px; overflow: hidden; position: relative; margin: 4px 0 2px; }
+  .bar i { display: block; height: 100%; background: var(--accent); }
+  .bar.over i { background: var(--danger); }
+  .bar b { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--warn); }
+  .barlabel { font: 11px ui-monospace, monospace; color: var(--muted); display: flex; justify-content: space-between; }
+  .bar.wake i { transition: width 60ms linear; background: var(--muted); }
+  .bar.wake.hot i { background: var(--led-green); }
+  table.comp { width: 100%; border-collapse: collapse; font-size: 12px; }
+  table.comp td { padding: 4px 0; border-bottom: 1px solid var(--line); }
+  table.comp td:last-child, table.comp td:nth-child(2) { text-align: right; font-family: ui-monospace, monospace; }
+  @media (max-width: 1100px) { main { grid-template-columns: 1fr; height: auto; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Kin</h1>
+  <span class="tag" id="profileTag">profile: …</span>
+  <span class="tag" id="brainTag"></span>
+  <span class="demo" id="demoTag" hidden>DEMO DATA · made-up week, not your memories <button class="btn" id="demoReset">Reset demo</button></span>
+  <span class="conn" id="conn">connecting…</span>
+</header>
+<main>
+  <section class="card" aria-label="Simulated device panel">
+    <h2>Simulated device</h2>
+    <div class="led-wrap">
+      <div class="led" id="led" role="img" aria-label="status LED"></div>
+      <div class="led-text">
+        <b id="ledLabel">Off</b>
+        <span class="stream" id="streamText">mic stream: closed</span>
+      </div>
+    </div>
+    <div class="row">
+      <label for="mute">Mute switch<small>closes the mic stream</small></label>
+      <label class="switch warn"><input type="checkbox" id="mute"><span></span></label>
+    </div>
+    <div class="row" style="display:block">
+      <label>Mic level</label>
+      <div class="meter"><i id="meter"></i></div>
+    </div>
+    <div class="row">
+      <label for="offline">Offline mode<small>Wi-Fi off: the gateway refuses lookups</small></label>
+      <label class="switch"><input type="checkbox" id="offline"><span></span></label>
+    </div>
+    <div class="row">
+      <label for="pi5">Pi 5 mode<small>Pi models, 4 threads, 2K context</small></label>
+      <label class="switch"><input type="checkbox" id="pi5"><span></span></label>
+    </div>
+    <button class="ptt" id="ptt">Hold to talk</button>
+    <div class="hint">…or hold <b>Space</b>, or say <b id="wakePhrase">the wake word</b>. Talking over Kin interrupts it.</div>
+    <div class="error" id="error"></div>
+    <div class="legend">
+      <i style="background:var(--led-off)"></i><span>off: muted, stream closed</span>
+      <i style="background:var(--led-green)"></i><span>green: listening</span>
+      <i style="background:#fff"></i><span>white pulse: attending / speaking</span>
+      <i style="background:var(--led-amber)"></i><span>amber: thinking</span>
+      <i style="background:var(--led-blue)"></i><span>blue: online lookup</span>
+    </div>
+  </section>
+
+  <section class="card" aria-label="Conversation">
+    <h2>Conversation</h2>
+    <div id="transcript"><div class="empty" id="empty">Say something. Passive lines appear on the left; lines worth keeping are saved to memory. Ask Kin with the button or wake word.</div></div>
+  </section>
+
+  <section class="card" aria-label="Details">
+    <div class="tabs">
+      <button data-tab="memory" class="on">Memory</button>
+      <button data-tab="tasks">Tasks</button>
+      <button data-tab="network">Network</button>
+      <button data-tab="system">System</button>
+    </div>
+    <div data-pane="memory">
+      <div class="memtools">
+        <input id="memSearch" type="search" placeholder="Search memories (semantic)…" autocomplete="off">
+        <button class="btn danger" id="forget10" title="Delete everything remembered in the last 10 minutes">Forget last 10 min</button>
+      </div>
+      <div class="review" id="reviewCard">What I remembered today: loading…</div>
+      <label class="memcount"><input type="checkbox" id="memHistory"> show replaced and retracted facts (history)</label>
+      <label class="memcount"><input type="checkbox" id="onlyMe"> only remember facts about me (skip facts about other people)</label>
+      <div class="memcount" id="memCount">loading…</div>
+      <div id="memList"></div>
+      <div class="people">
+        <h3>People</h3>
+        <div class="memcount">Names Kin has heard, with the misheard spellings it corrected. Click a name to rename it (the old spelling becomes an alias).</div>
+        <div id="peopleList"></div>
+        <div class="memtools"><input id="personName" placeholder="Add a name, e.g. Priya" autocomplete="off"><button class="btn" id="personAdd">Add</button></div>
+      </div>
+    </div>
+    <div data-pane="system" hidden>
+      <h3>RAM</h3>
+      <div class="bar" id="ramBar"><i></i><b></b></div>
+      <div class="barlabel"><span id="ramText">–</span><span id="ramBudget"></span></div>
+      <table class="comp" id="components"></table>
+      <h3>Wake word</h3>
+      <div class="bar wake" id="wakeBar" role="meter" aria-label="Live wake word score" aria-valuemin="0" aria-valuemax="1"><i></i><b></b></div>
+      <div class="barlabel"><span id="wakeText">live score –</span><span id="wakeThr">threshold –</span></div>
+      <dl id="wakeStats"><dt>Last utterance max</dt><dd id="wakeLast">–</dd><dt>Last activation</dt><dd id="wakeAct">–</dd></dl>
+      <h3>Last query</h3>
+      <dl id="lastQuery"><dt>–</dt><dd>no query yet</dd></dl>
+      <h3>Passive router</h3>
+      <dl id="routerStats"><dt>–</dt><dd>loading…</dd></dl>
+      <table class="tags" id="routerTags"></table>
+      <h3>Memory health</h3>
+      <dl id="health"><dt>–</dt><dd>loading…</dd></dl>
+      <div class="memtools"><button class="btn" id="runMaint">Run maintenance now</button><button class="btn" id="backupBtn">Encrypted backup…</button><button class="btn" id="checkBtn">Test a backup…</button></div>
+      <h3>Configuration</h3>
+      <dl id="system"></dl>
+    </div>
+    <div data-pane="tasks" hidden>
+      <div class="memcount" id="taskCount">loading…</div>
+      <div id="taskList"></div>
+      <p class="soon" style="margin-top:12px">Say “remind me to email the professor at 5”, “add oat milk to my list”, “what’s on my list?” or “mark oat milk as done”.</p>
+    </div>
+    <div data-pane="network" hidden>
+      <dl id="netStatus"></dl>
+      <div class="memcount" id="netCount">No lookups yet. Only the gateway process may go online; the brain process cannot open a socket.</div>
+      <div id="netList"></div>
+    </div>
+  </section>
+</main>
+
+<dialog class="kdlg" id="backupDlg">
+  <form method="dialog" id="backupForm">
+    <h3>Encrypted backup</h3>
+    <label for="bkFolder">Local folder (e.g. a USB drive). Nothing is uploaded.</label>
+    <input id="bkFolder" required autocomplete="off">
+    <label for="bkPass">Passphrase. Without it the backup cannot be opened, and nobody can reset it.</label>
+    <input id="bkPass" type="password" required autocomplete="new-password">
+    <label for="bkPass2">Type the passphrase again</label>
+    <input id="bkPass2" type="password" required autocomplete="new-password">
+    <div class="msg" id="bkMsg" aria-live="polite"></div>
+    <div class="acts"><button class="btn" value="cancel" formnovalidate>Cancel</button><button class="btn" id="bkSave" value="save" disabled>Save backup</button></div>
+  </form>
+</dialog>
+<dialog class="kdlg" id="checkDlg">
+  <form method="dialog" id="checkForm">
+    <h3>Test a backup (restore drill)</h3>
+    <label for="ckFile">Backup file (.kinbak)</label>
+    <input id="ckFile" required autocomplete="off">
+    <label for="ckPass">Its passphrase</label>
+    <input id="ckPass" type="password" required autocomplete="off">
+    <div class="msg" id="ckMsg" aria-live="polite">Opens a copy in a temporary folder and checks it. Your memory is not touched.</div>
+    <div class="acts"><button class="btn" value="cancel" formnovalidate>Close</button><button class="btn" id="ckRun" value="check">Test restore</button></div>
+  </form>
+</dialog>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const LED_LABEL = { off: "Off", green: "Listening", white_pulse: "Attending", amber: "Thinking", blue: "Online lookup" };
+const PI_RAM_MB = 4096;
+let ws, snap = {}, held = false, levelTimer, memTimer, sysTimer;
+const replies = {};
+
+function send(cmd, value) {
+  if (ws && ws.readyState === 1) ws.send(JSON.stringify({ cmd, value }));
+}
+
+function connect() {
+  ws = new WebSocket(`ws://${location.host}/ws`);
+  ws.onopen = () => { $("conn").textContent = "connected · localhost only"; $("conn").classList.remove("bad"); loadMemories(); loadTasks(); loadNetwork(); };
+  ws.onclose = () => { $("conn").textContent = "disconnected, retrying…"; $("conn").classList.add("bad"); setTimeout(connect, 1000); };
+  ws.onmessage = (m) => handle(JSON.parse(m.data));
+}
+
+function handle(e) {
+  switch (e.type) {
+    case "Snapshot": snap = e; renderSnapshot(); break;
+    case "LedChanged": setLed(e.color); break;
+    case "StreamStateChanged":
+      snap.stream_open = e.open; if (e.device) snap.device = e.device;
+      snap.error = e.error || null; renderStream(); renderSystem(); break;
+    case "MuteChanged": snap.muted = e.muted; $("mute").checked = e.muted; renderStream(); break;
+    case "OfflineChanged": snap.offline = e.offline; $("offline").checked = e.offline; break;
+    case "AudioLevel": setLevel(e.rms_db); break;
+    case "WakeLevel": setWake(e.score, e.threshold); break;
+    case "SpeechEnded":
+      if (e.wake_max != null) $("wakeLast").textContent =
+        `${e.wake_max.toFixed(3)} · ${e.wake_max >= wakeThreshold ? "at or above" : "below"} the threshold`;
+      break;
+    case "TranscriptEvent": upsertLine(e); break;
+    case "ActivationEvent":
+      $("wakeAct").textContent = e.source === "wake_word" ? `wake word · score ${e.score}` : e.source === "wake_phrase" ? "wake phrase (heard in the transcript)" : "button";
+      divider(`activated by ${{ button: "button", wake_word: "wake word", wake_phrase: "wake phrase in the transcript" }[e.source] || e.source}${e.score != null ? " · score " + e.score : ""}`, true); break;
+    case "AttendingEnded": divider(`query captured · ${e.reason.replace("_", " ")}`); break;
+    case "PipelineStateChanged": snap.state = e.state; renderSystem(); break;
+    case "BrainStateChanged": $("brainTag").textContent = e.state === "idle" ? "" : `brain: ${e.state}`; break;
+    case "QueryReceived": replyBubble(e.query_id, e.text); break;
+    case "ReplySentence": addSentence(e); break;
+    case "ReplyCompleted": finishReply(e); refreshSystem(); break;
+    case "MemoryStored": markStored(e); scheduleMemories(); break;
+    case "FactSuperseded": case "FactChanged": scheduleMemories(); break;
+    case "EpisodeExtracted": scheduleMemories(); if (!document.querySelector('[data-pane="system"]').hidden) refreshSystem(); break;
+    case "MemoriesDeleted": scheduleMemories(); break;
+    case "LookupPerformed": addLookup(e); break;
+    case "GatewayStatus": snap.gateway = { ...(snap.gateway || {}), running: e.running, offline: e.offline, detail: e.detail }; loadNetwork(); break;
+    case "TaskChanged": loadTasks(); break;
+    case "Announcement": announce(e.text); break;
+    case "ConfirmationRequested": confirmCard(e); break;
+    case "ConfirmationResolved": confirmResolved(e); break;
+    case "PassiveTagged": if (!document.querySelector('[data-pane="system"]').hidden) refreshSystem(); break;
+    case "ProfileChanged":
+      $("pi5").disabled = e.loading;
+      $("profileTag").textContent = e.loading ? `loading ${e.profile}…` : `profile: ${e.profile}`;
+      if (e.error) $("error").textContent = e.error;
+      if (!e.loading) { send("snapshot"); scheduleMemories(); refreshSystem(); }
+      break;
+    case "Error": $("error").textContent = e.message; break;
+  }
+}
+
+function renderSnapshot() {
+  $("profileTag").textContent = `profile: ${snap.profile}`;
+  $("brainTag").textContent = snap.brain === "ready" ? "" : `brain: ${snap.brain}`;
+  $("mute").checked = snap.muted;
+  $("offline").checked = snap.offline;
+  $("pi5").checked = snap.profile === "pi5";
+  $("pi5").disabled = !!snap.loading;
+  $("wakePhrase").textContent = snap.wake_phrase ? `"${snap.wake_phrase}"` : "the wake word";
+  if (snap.wake_threshold != null) setWake(0, snap.wake_threshold);
+  setLed(snap.led);
+  renderStream();
+  renderSystem();
+  $("transcript").innerHTML = "";
+  if (!snap.transcripts.length) $("transcript").innerHTML = '<div class="empty" id="empty">Say something. Passive lines appear on the left; lines worth keeping are saved to memory. Ask Kin with the button or wake word.</div>';
+  snap.transcripts.forEach(upsertLine);
+}
+
+function renderStream() {
+  const open = !!snap.stream_open;
+  $("streamText").textContent = `mic stream: ${open ? "open" : "closed"}`;
+  $("streamText").classList.toggle("closed", !open);
+  $("ptt").disabled = !open;
+  $("error").textContent = snap.error || "";
+  if (!open) setLevel(-100);
+}
+
+function renderSystem() {
+  const m = snap.models || {}, l = snap.limits || {};
+  const rows = [
+    ["Profile", snap.profile], ["Pipeline", snap.state], ["Brain", snap.brain],
+    ["Mic", snap.stream_open ? `${snap.device || "default"} · 16 kHz` : "stream closed"],
+    ["LLM", m.llm || "loading…"], ["Embedder", m.embedder], ["TTS", m.tts || "off"], ["Router", m.router],
+    ["Passive STT", m.passive_stt], ["Query STT", `${m.query_stt}${m.query_stt_loaded ? "" : " (lazy)"}`],
+    ["VAD / wake", `${m.vad} · ${m.wake || "no wake word"}`],
+    ["Context cap", `${l.llm_context_tokens} tokens`], ["Prompt budget", `${l.prompt_token_budget} tokens`],
+    ["Answer floor", l.answer_floor], ["One-call answer at", l.strong_score], ["Reranker", l.reranker ? "on" : "off"], ["LLM timeout", `${l.llm_timeout_s} s`],
+    ["Threads", l.threads ?? "auto"], ["Ring buffer", `${l.ring_buffer_seconds}s · RAM only`],
+  ];
+  $("system").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${esc(String(v ?? "–"))}</dd>`).join("");
+}
+
+async function refreshHealth() {
+  const r = await fetch("/api/health");
+  if (!r.ok) return;
+  const h = await r.json(), m = h.last_maintenance;
+  const ago = (ts) => (ts ? new Date(ts * 1000).toLocaleString() : "never");
+  $("health").innerHTML = [
+    ["Facts", Object.entries(h.facts).map(([k, v]) => `${v} ${k}`).join(", ") || "0"],
+    ["Pinned · about others", `${h.pinned} · ${h.about_others}`],
+    ["Raw lines · people · changes", `${h.utterances} · ${h.people} · ${h.changes}`],
+    ["Extraction backlog", `${(h.episodes.ready || 0) + (h.episodes.failed || 0)} conversations`],
+    ["Last extraction", ago(h.last_extraction_ts)],
+    ["Database (encrypted)", `${(h.db_bytes / 1e6).toFixed(2)} MB`],
+    ["Last maintenance", m ? `${ago(m.ts)} · integrity ${m.integrity} · purged ${m.purged_lines} lines, ${m.purged_facts} facts · ${m.total_ms} ms` : "never"],
+  ].map(([k, v]) => `<dt>${k}</dt><dd>${esc(String(v))}</dd>`).join("");
+}
+$("runMaint").onclick = async () => { $("runMaint").disabled = true; await post("/api/maintenance"); $("runMaint").disabled = false; refreshHealth(); };
+// Backup: passphrase typed twice and checked for strength before the Save button works.
+let bkTimer = null;
+async function backupState() {
+  const p = $("bkPass").value, q = $("bkPass2").value, msg = $("bkMsg");
+  let problem = null;
+  if (p) {
+    const r = await fetch("/api/backup/strength", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ passphrase: p }) });
+    problem = (await r.json()).problem;
+  }
+  const ok = p && !problem && p === q && $("bkFolder").value.trim();
+  msg.className = "msg " + (problem || (q && p !== q) ? "bad" : ok ? "good" : "");
+  msg.textContent = !p ? "" : problem ? problem : q && p !== q ? "The two passphrases differ." : !q ? "Strong enough. Type it again." : ok ? "Ready." : "Choose a folder.";
+  $("bkSave").disabled = !ok;
+}
+for (const id of ["bkFolder", "bkPass", "bkPass2"]) $(id).addEventListener("input", () => { clearTimeout(bkTimer); bkTimer = setTimeout(backupState, 150); });
+$("backupBtn").onclick = () => { $("backupForm").reset(); $("bkMsg").textContent = ""; $("bkSave").disabled = true; $("backupDlg").showModal(); };
+$("backupForm").addEventListener("submit", async (e) => {
+  if (e.submitter?.value !== "save") return;
+  e.preventDefault();
+  $("bkSave").disabled = true;
+  $("bkMsg").className = "msg"; $("bkMsg").textContent = "Saving…";
+  const body = { folder: $("bkFolder").value.trim(), passphrase: $("bkPass").value, confirm: $("bkPass2").value };
+  const r = await fetch("/api/backup", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const j = await r.json();
+  $("bkMsg").className = "msg " + (r.ok ? "good" : "bad");
+  $("bkMsg").textContent = r.ok ? `Saved ${j.file} (${(j.bytes / 1e6).toFixed(1)} MB). Restore with: kin restore <file>` : `Backup failed: ${j.detail}`;
+  $("bkPass").value = $("bkPass2").value = "";
+});
+$("checkBtn").onclick = () => { $("checkForm").reset(); $("ckMsg").className = "msg"; $("checkDlg").showModal(); };
+$("checkForm").addEventListener("submit", async (e) => {
+  if (e.submitter?.value !== "check") return;
+  e.preventDefault();
+  $("ckMsg").className = "msg"; $("ckMsg").textContent = "Checking…";
+  const r = await fetch("/api/backup/check", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ file: $("ckFile").value.trim(), passphrase: $("ckPass").value }) });
+  const j = await r.json();
+  $("ckMsg").className = "msg " + (r.ok ? "good" : "bad");
+  $("ckMsg").textContent = r.ok ? `Restorable: backup from ${j.created}, ${j.facts ?? 0} facts, ${j.lines ?? 0} lines, integrity ${j.integrity}.` : `Not restorable: ${j.detail}`;
+  $("ckPass").value = "";
+});
+
+async function refreshSystem() {
+  refreshHealth();
+  try {
+    const s = await (await fetch("/api/system")).json();
+    const target = s.ram_target_mb, max = Math.max(PI_RAM_MB, s.rss_mb);
+    $("ramBar").querySelector("i").style.width = `${(s.rss_mb / max) * 100}%`;
+    const marker = $("ramBar").querySelector("b");
+    marker.style.display = target ? "block" : "none";
+    if (target) marker.style.left = `${(target / max) * 100}%`;
+    $("ramBar").classList.toggle("over", !!target && s.rss_mb > target);
+    $("ramText").textContent = `${Math.round(s.rss_mb)} MB process RSS · CPU ${s.cpu_percent}%`;
+    $("ramBudget").textContent = target ? `Pi target ${target} MB of 4 GB` : "bar = Pi 5 4 GB";
+    const comps = Object.entries(s.components || {});
+    $("components").innerHTML = comps.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${v.ram_mb} MB</td><td>${v.load_s} s</td></tr>`).join("")
+      || '<tr><td class="soon">loading models…</td></tr>';
+    const q = s.last_query;
+    $("lastQuery").innerHTML = q ? [
+      ["Time to first audio", q.time_to_first_audio_ms != null ? `${q.time_to_first_audio_ms} ms` : "–"],
+      ["LLM first token", q.llm_ttft_ms != null ? `${q.llm_ttft_ms} ms` : "–"],
+      ["Tokens/s", q.tokens_per_s ?? "–"], ["Prompt tokens", q.prompt_tokens ?? "–"],
+      ["Total", q.total_ms != null ? `${q.total_ms} ms` : "–"], ["Backend", q.backend ?? "–"],
+      ["Path", q.path || "–"], ["LLM calls", q.llm_calls ?? "–"],
+    ].map(([k, v]) => `<dt>${k}</dt><dd>${esc(String(v))}</dd>`).join("") : "<dt>–</dt><dd>no query yet</dd>";
+    const r = s.router;
+    $("routerStats").innerHTML = r ? [
+      ["Pre-filter", `semantic (chatter if score ≥ ${r.accept_score}, margin ≥ ${r.accept_margin})`],
+      ["Extraction queue", `${r.pending} episode${r.pending === 1 ? "" : "s"} waiting for the LLM`],
+      ["Last extractions", (r.extraction || []).slice(0, 5).map((x) => `#${x.episode} ${x.outcome} +${x.added}/~${x.updated}/=${x.duplicates} ${x.ms} ms`).join(" · ") || "–"],
+      ["LLM queue", `${r.llm_queue} waiting`],
+    ].map(([k, v]) => `<dt>${k}</dt><dd>${esc(String(v))}</dd>`).join("") : "<dt>–</dt><dd>brain not ready</dd>";
+    $("routerTags").innerHTML = r && r.recent.length ? r.recent.map((t) =>
+      `<tr><td>${esc(t.text)}</td><td>${esc(t.label)}</td><td class="num">${t.source === "semantic" ? `score ${t.score.toFixed(2)} · margin ${t.margin.toFixed(2)}` : t.source}</td><td>${esc(t.decision)}</td></tr>`).join("")
+      : '<tr><td class="soon">No overheard lines yet.</td></tr>';
+  } catch (_) { /* server restarting */ }
+}
+
+let wakeThreshold = 0.5;
+function setWake(score, threshold) {
+  wakeThreshold = threshold;
+  const bar = $("wakeBar");
+  bar.querySelector("i").style.width = `${Math.min(1, Math.max(0, score)) * 100}%`;
+  bar.querySelector("b").style.left = `${threshold * 100}%`;
+  bar.classList.toggle("hot", score >= threshold);
+  bar.setAttribute("aria-valuenow", String(score));
+  $("wakeText").textContent = `live score ${score.toFixed(2)}`;
+  $("wakeThr").textContent = `threshold ${threshold}`;
+}
+
+function setLed(color) {
+  snap.led = color;
+  $("led").className = `led ${color}`;
+  $("ledLabel").textContent = LED_LABEL[color] || color;
+}
+
+function setLevel(db) {
+  const pct = Math.max(0, Math.min(100, ((db + 60) / 60) * 100));
+  $("meter").style.width = pct + "%";
+  clearTimeout(levelTimer);
+  levelTimer = setTimeout(() => ($("meter").style.width = "0%"), 400);
+}
+
+function clearEmpty() { const empty = $("empty"); if (empty) empty.remove(); }
+
+function upsertLine(e) {
+  clearEmpty();
+  let el = document.querySelector(`[data-line="${e.line_id}"]`);
+  if (!el) {
+    el = document.createElement("div");
+    el.dataset.line = e.line_id;
+    el.innerHTML = '<div class="meta"></div><div class="text"></div>';
+    $("transcript").appendChild(el);
+  }
+  el.className = `line ${e.mode}${e.final ? "" : " partial"}`;
+  const t = new Date(e.ts * 1000).toLocaleTimeString();
+  el.querySelector(".meta").textContent = `${t} · ${e.mode === "query" ? "you asked" : "heard"}${e.stt_model ? ` · ${e.stt_model.replace("moonshine-", "Moonshine ")}` : ""}${e.speaker ? ` · ${e.speaker}` : ""}${e.final ? "" : " · …"}`;
+  el.querySelector(".text").textContent = e.text;
+  scrollDown();
+}
+
+function markStored(e) {
+  const lines = [...document.querySelectorAll(".line.passive")].reverse();
+  const el = lines.find((l) => l.querySelector(".text").textContent === e.text);
+  if (!el || el.querySelector(".saved")) return;
+  el.classList.add("stored");
+  const s = document.createElement("div");
+  s.className = "saved";
+  s.textContent = `saved as memory #${e.id} · ${e.kind.replace(/_/g, " ")}`;
+  el.appendChild(s);
+}
+
+function divider(text, act) {
+  clearEmpty();
+  const d = document.createElement("div");
+  d.className = "divider" + (act ? " act" : "");
+  d.textContent = text;
+  $("transcript").appendChild(d);
+  scrollDown();
+}
+
+// --- network monitor, tasks, announcements -------------------------------------------
+const lookupsByQuery = {};
+let currentQuery = null;
+
+function netEntry(e) {
+  const when = new Date(e.ts * 1000).toLocaleTimeString();
+  const upstream = Array.isArray(e.upstream) ? e.upstream : (e.upstream ? e.upstream.split("\n") : []);
+  return `<div class="net">
+    <div class="head"><span class="kind">${esc(e.kind || "?")}</span><span class="st ${e.status}">${esc(e.status)}${e.reason ? " · " + esc(e.reason) : ""}</span>
+      <span class="meta">${when} · ${e.duration_ms} ms · ${e.response_bytes} B in${e.scrubbed ? ` · ${e.scrubbed} name word(s) scrubbed` : ""}${e.provider ? " · " + esc(e.provider) : ""}</span></div>
+    <div class="meta" style="margin-top:4px">exact JSON the brain sent:</div>
+    <code>${esc(e.request || "(rejected before parsing)")}</code>
+    ${upstream.length ? `<div class="meta" style="margin-top:4px">sent to the internet:</div><code>${upstream.map(esc).join("\n")}</code>` : ""}
+  </div>`;
+}
+
+function addLookup(e) {
+  if (currentQuery) (lookupsByQuery[currentQuery] = lookupsByQuery[currentQuery] || []).push(e);
+  const list = $("netList");
+  list.insertAdjacentHTML("afterbegin", netEntry({ ...e, id: e.request_id }));
+  $("netCount").textContent = `${list.children.length} lookups shown · newest first`;
+}
+
+async function loadNetwork() {
+  try {
+    const d = await (await fetch("/api/network?limit=100")).json();
+    const g = d.gateway || {};
+    $("netStatus").innerHTML = [
+      ["Gateway process", g.running ? "running" : `not running${g.detail ? " (" + g.detail + ")" : ""}`],
+      ["Offline mode", g.offline ? "ON: every lookup is refused" : "off"],
+      ["Brain socket guard", d.network_guard ? "ON: outbound sockets blocked" : "off"],
+      ["Allowed hosts", (g.hosts || []).join(", ") || "–"],
+      ["Providers", Object.entries(g.providers || {}).map(([k, v]) => `${k}: ${v}`).join(", ") || "–"],
+    ].map(([k, v]) => `<dt>${k}</dt><dd>${esc(String(v))}</dd>`).join("");
+    $("netList").innerHTML = d.entries.slice().reverse().map(netEntry).join("");
+    $("netCount").textContent = d.entries.length ? `${d.entries.length} lookups · newest first` : "No lookups yet. Only the gateway process may go online; the brain process cannot open a socket.";
+  } catch (_) { /* server restarting */ }
+}
+
+async function loadTasks() {
+  const res = await fetch("/api/tasks");
+  if (!res.ok) { $("taskCount").textContent = "tasks are loading…"; setTimeout(loadTasks, 1500); return; }
+  const items = (await res.json()).items;
+  $("taskCount").textContent = items.length ? `${items.length} open · stored encrypted on this device` : "Nothing on your list.";
+  $("taskList").innerHTML = items.map((t) => `
+    <div class="mem">
+      <div class="t">${t.kind === "reminder" ? "⏰ " : "☐ "}${esc(t.text)}</div>
+      <div class="m">${t.due_ts ? "due " + new Date(t.due_ts * 1000).toLocaleString() : "no due time"}</div>
+      <div class="acts"><button title="Done" data-done="${t.id}">✓</button><button title="Delete" data-tdel="${t.id}">✕</button></div>
+    </div>`).join("");
+}
+
+$("taskList").addEventListener("click", async (e) => {
+  if (e.target.dataset.done) await fetch(`/api/tasks/${e.target.dataset.done}/done`, { method: "POST" });
+  if (e.target.dataset.tdel) await fetch(`/api/tasks/${e.target.dataset.tdel}`, { method: "DELETE" });
+});
+
+function announce(text) {
+  clearEmpty();
+  const d = document.createElement("div");
+  d.className = "announce";
+  d.textContent = `🔔 ${text}`;
+  $("transcript").appendChild(d);
+  scrollDown();
+}
+
+const confirms = {};
+function confirmCard(e) {
+  clearEmpty();
+  const el = document.createElement("div");
+  el.className = "confirm";
+  el.innerHTML = `<div class="meta">needs confirmation · ${esc(e.action.replace("_", " "))}</div><div class="text"></div>
+    <div class="actions"><button class="btn danger">Confirm</button><button class="btn">Cancel</button></div>`;
+  el.querySelector(".text").textContent = e.summary;
+  const [yes, no] = el.querySelectorAll("button");
+  yes.onclick = () => send("confirm", { id: e.confirm_id, accept: true });
+  no.onclick = () => send("confirm", { id: e.confirm_id, accept: false });
+  confirms[e.confirm_id] = el;
+  $("transcript").appendChild(el);
+  scrollDown();
+}
+
+function confirmResolved(e) {
+  const el = confirms[e.confirm_id];
+  if (!el) return;
+  el.classList.add("done");
+  el.querySelector(".actions").remove();
+  el.querySelector(".meta").textContent = { confirmed: "confirmed", cancelled: "cancelled · nothing deleted",
+    expired: "expired · nothing deleted" }[e.outcome] + (e.detail && e.outcome === "confirmed" ? ` · ${e.detail}` : "");
+  delete confirms[e.confirm_id];
+}
+
+function replyBubble(id, query) {
+  currentQuery = id;
+  clearEmpty();
+  const el = document.createElement("div");
+  el.className = "reply";
+  el.innerHTML = '<div class="meta">Kin · thinking…</div><div class="text"></div><div class="badges"></div>';
+  $("transcript").appendChild(el);
+  replies[id] = el;
+  scrollDown();
+}
+
+function addSentence(e) {
+  const el = replies[e.query_id] || (replyBubble(e.query_id, ""), replies[e.query_id]);
+  const t = el.querySelector(".text");
+  t.textContent = (t.textContent ? t.textContent + " " : "") + e.text;
+  el.querySelector(".meta").textContent = "Kin · speaking…";
+  scrollDown();
+}
+
+function finishReply(e) {
+  const el = replies[e.query_id] || (replyBubble(e.query_id, e.query), replies[e.query_id]);
+  el.classList.add(e.outcome);
+  el.querySelector(".text").textContent = e.text || "(no reply)";
+  const label = { answered: "answered from memory", abstained: "not sure", timeout: "stopped: took too long",
+    interrupted: "interrupted", error: "error", command: "command", chit_chat: "chat" }[e.outcome] || e.outcome;
+  el.querySelector(".meta").textContent = `Kin · ${label} · 🔊 spoken`;
+  const badges = el.querySelector(".badges");
+  (e.citations ? e.citations.split(",") : []).forEach((id) => {
+    const b = document.createElement("span");
+    b.className = "badge"; b.textContent = `from memory #${id}`;
+    b.onclick = () => showMemory(id);
+    badges.appendChild(b);
+  });
+  if (e.blocked_sentences) badges.insertAdjacentHTML("beforeend", `<span class="badge warn">${e.blocked_sentences} uncited sentence${e.blocked_sentences > 1 ? "s" : ""} blocked</span>`);
+  if (e.path) badges.insertAdjacentHTML("afterbegin", `<span class="badge path">${esc(e.path)}</span>`);
+  if (e.llm_calls) badges.insertAdjacentHTML("beforeend", `<span class="badge plain">${e.llm_calls} LLM call${e.llm_calls > 1 ? "s" : ""}</span>`);
+  if (e.time_to_first_audio_ms != null) badges.insertAdjacentHTML("beforeend", `<span class="badge plain">first audio ${e.time_to_first_audio_ms} ms</span>`);
+  if (e.tokens_per_s) badges.insertAdjacentHTML("beforeend", `<span class="badge plain">${e.tokens_per_s} tok/s</span>`);
+  (lookupsByQuery[e.query_id] || []).forEach((l) => badges.insertAdjacentHTML("afterbegin",
+    l.status === "ok" ? `<span class="badge online">checked ${l.kind} online</span>`
+                      : `<span class="badge warn">${l.kind} lookup ${l.reason || l.status}</span>`));
+  delete lookupsByQuery[e.query_id];
+  if (e.outcome === "abstained" && e.closest_text) {
+    el.insertAdjacentHTML("beforeend", `<div class="closest">Closest memory (#${e.closest_id}, similarity ${e.closest_similarity}): “${esc(e.closest_text)}”</div>`);
+  }
+  if (e.explain) el.appendChild(whyPanel(e.explain));
+  delete replies[e.query_id];
+  scrollDown();
+}
+
+// "Why this answer?": what recall understood, which facts it offered (with every score), and what it left out.
+function whyPanel(raw) {
+  let w;
+  try { w = JSON.parse(raw); } catch { return document.createTextNode(""); }
+  const d = document.createElement("details");
+  d.className = "why";
+  const p = w.plan || {}, dec = w.decision || {};
+  const f3 = (x) => (x == null ? "–" : Number(x).toFixed(3));
+  const plan = [];
+  if (p.time) plan.push(`time <b>“${esc(p.time.label)}”</b> → ${esc(p.time.from.replace("T", " "))} to ${esc(p.time.to.replace("T", " "))} (${p.time.field === "event" ? "when it happens" : "heard or happening"})`);
+  if (p.people && p.people.length) plan.push(`people <b>${p.people.map(esc).join(", ")}</b>`);
+  if (p.future) plan.push("<b>upcoming</b> events preferred");
+  if (p.history) plan.push("<b>history</b>: replaced facts included");
+  if (p.alt) plan.push(`model's rewording <b>“${esc(p.alt)}”</b> searched too`);
+  const conf = dec.confidence;
+  const verdict = conf == null ? '<span class="no">no memory matched</span>'
+    : conf >= dec.answer_floor ? `<span class="ok">confidence ${f3(conf)} ≥ floor ${dec.answer_floor}</span>`
+    : `<span class="no">confidence ${f3(conf)} &lt; floor ${dec.answer_floor}: not enough to answer</span>`;
+  const how = dec.shortcut ? `≥ ${dec.strong_score}: answered in <b>one LLM call</b> (no tool-choice call)` : "";
+  const rows = (w.used || []).map((u) => {
+    const ranks = Object.entries(u.ranks || {}).map(([k, v]) => `${k} #${v}`).join(" · ") || "–";
+    const tags = (u.cited ? '<span class="tag used">cited</span>' : "")
+      + (u.backfill || []).map((m) => `<span class="tag warn">${m === "time" ? "outside the time asked" : m === "person" ? "doesn't name " + esc((p.people || []).join("/")) : esc(m)}</span>`).join("")
+      + (u.status !== "active" ? `<span class="tag warn">${esc(u.status)}</span>` : "");
+    return `<tr class="${u.cited ? "cited" : ""}"><td>#${u.id} ${esc(u.text)}${tags}</td><td class="n">${f3(u.cos)}</td><td class="n">${esc(ranks)}</td>`
+      + `<td class="n">${u.rrf != null ? (u.rrf * 1000).toFixed(2) : "–"}${u.boost && u.boost !== 1 ? " ×" + u.boost : ""}</td><td class="n">${f3(u.rerank)}</td><td class="n">${f3(u.confidence)}</td></tr>`;
+  }).join("");
+  const out = (w.filtered || []).map((f) => `<tr class="out"><td>#${f.id} ${esc(f.text)}<span class="tag">${esc(f.filtered || "")}</span></td><td class="n">${f3(f.cos)}</td><td colspan="4"></td></tr>`).join("");
+  const lines = (w.lines || []).map((x) => `<li>${new Date(x.ts * 1000).toLocaleString([], { weekday: "short", hour: "2-digit", minute: "2-digit" })}: “${esc(x.text)}” <span class="tag${(dec.heard_lines || []).includes(x.id) ? " used" : ""}">${f3(x.score)}</span></li>`).join("");
+  const conflicts = (w.conflicts || []).map(([a, b]) => `#${a} and #${b}`).join(", ");
+  d.innerHTML = `<summary>Why this answer?</summary>
+    <div class="plan">${plan.length ? "Understood: " + plan.join(" · ") : "No time or person in the question: searched everything."}</div>
+    <div class="decision">${verdict}${how ? " · " + how : ""}${dec.reranker ? " · reranked by the cross-encoder" : ""} · retrieval ${w.ms ?? "–"} ms</div>
+    ${conflicts ? `<div class="decision"><span class="no">Disagreeing facts, neither replaced: ${conflicts}</span> (both are given, with when each was heard)</div>` : ""}
+    <div class="scroll"><table class="facts"><tr><th>Facts offered, best first</th><th>cosine</th><th>ranks (RRF k=60)</th><th>RRF ×1000</th><th>rerank</th><th>conf.</th></tr>${rows || '<tr><td colspan="6">none</td></tr>'}
+    ${out ? `<tr><th colspan="6">Left out</th></tr>${out}` : ""}</table></div>
+    ${lines ? `<div class="plan">Heard (raw transcript, used only when no fact is close enough):</div><ul>${lines}</ul>` : ""}`;
+  return d;
+}
+
+function scrollDown() { const c = $("transcript").parentElement; c.scrollTop = c.scrollHeight; }
+function esc(s) { return String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); }
+
+// --- memory tab ---------------------------------------------------------------------------
+function scheduleMemories() { clearTimeout(memTimer); memTimer = setTimeout(loadMemories, 150); }
+
+async function loadMemories() {
+  loadPeople();
+  const q = $("memSearch").value.trim();
+  const hist = $("memHistory").checked;
+  const url = q ? `/api/memories?q=${encodeURIComponent(q)}` : `/api/memories?limit=200${hist ? "&history=1" : ""}`;
+  const res = await fetch(url);
+  if (res.status === 503) { $("memCount").textContent = "memory is loading…"; setTimeout(loadMemories, 1500); return; }
+  const data = await res.json();
+  const waiting = (data.episodes?.ready || 0) + (data.episodes?.failed || 0);
+  $("memCount").textContent = (q ? `${data.items.length} closest of ${data.total} facts` : `${data.total} facts · ${data.superseded} replaced · encrypted on this device`)
+    + (waiting ? ` · ${waiting} conversation${waiting === 1 ? "" : "s"} waiting to be read` : "");
+  $("memList").innerHTML = data.items.map((m) => `
+    <div class="mem${m.status === "superseded" ? " old" : ""}${m.status === "retracted" ? " retracted" : ""}${m.pinned ? " pinned" : ""}" data-mem="${m.id}">
+      <div class="t">${m.pinned ? "📌 " : ""}${esc(m.text)}</div>
+      <div class="m">#${m.id} · ${m.kind.replace(/_/g, " ")} · ${m.source}${m.subject ? ` · <span class="${m.about_other ? "other" : ""}">about ${esc(m.subject)}${m.about_other ? " (another person)" : ""}</span>` : ""} · heard ${new Date(m.ts * 1000).toLocaleString()}${m.event_ts ? ` · for ${new Date(m.event_ts * 1000).toLocaleString()}` : ""}${m.status === "superseded" ? ` · replaced by #${m.superseded_by}` : m.status !== "active" ? ` · ${m.status}` : ""}${m.similarity != null ? ` · sim ${m.similarity}` : ""}</div>
+      <div class="acts"><a data-hist="${m.id}">history & evidence</a>${m.status === "active" ? `<a data-edit="${m.id}">edit</a><a data-retract="${m.id}">wrong (retract)</a><a data-pin="${m.id}" data-on="${m.pinned ? 0 : 1}">${m.pinned ? "unpin" : "pin"}</a><a data-merge="${m.id}">merge…</a>` : ""}${m.status === "retracted" ? `<a data-restore="${m.id}">restore</a>` : ""}</div>
+      <button title="Delete memory #${m.id} for good" data-del="${m.id}">✕</button>
+    </div>`).join("") || '<p class="soon">Nothing remembered yet.</p>';
+  loadReview();
+}
+
+// "What I remembered today": new facts and every change, so mistakes are fixed while they are fresh.
+async function loadReview() {
+  const r = await (await fetch("/api/review")).json();
+  const verb = { correct: "corrected", retract: "retracted", restore: "restored", pin: "pinned", unpin: "unpinned", merge: "merged", supersede: "replaced" };
+  const added = r.added.map((f) => `<li data-goto="${f.id}">${f.status !== "active" ? "<s>" : ""}${esc(f.text)}${f.status !== "active" ? "</s>" : ""} <span class="chg">#${f.id}${f.about_other ? " · about another person" : ""}</span></li>`).join("");
+  const changes = r.changes.map((c) => `<li class="chg">#${c.fact_id} ${verb[c.action] || c.action} by ${esc(c.actor)}${c.new_text && c.action !== "pin" ? `: “${esc(c.new_text)}”` : ""}</li>`).join("");
+  $("reviewCard").innerHTML = `<b>What I remembered today</b> · ${r.added.length} new, ${r.changes.length} changes`
+    + (added ? `<ul>${added}</ul>` : '<div class="chg">Nothing new yet today.</div>') + (changes ? `<ul>${changes}</ul>` : "");
+}
+$("reviewCard").addEventListener("click", (e) => { const id = e.target.closest("[data-goto]")?.dataset.goto; if (id) showMemory(id); });
+
+async function post(url, body) {
+  const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body || {}) });
+  if (!r.ok) alert((await r.json().catch(() => ({}))).detail || `failed (${r.status})`);
+  scheduleMemories();
+  return r;
+}
+
+async function showMemory(id) {
+  document.querySelector('[data-tab="memory"]').click();
+  $("memSearch").value = "";
+  await loadMemories();
+  const el = document.querySelector(`[data-mem="${id}"]`);
+  if (el) { el.scrollIntoView({ block: "center" }); el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash"); }
+}
+
+$("memList").addEventListener("click", async (e) => {
+  const d = e.target.dataset;
+  if (d.hist) return showHistory(d.hist);
+  if (d.edit) {
+    const old = e.target.closest(".mem").querySelector(".t").textContent.replace(/^📌 /, "");
+    const text = prompt("Corrected memory (the old version is kept in its history):", old);
+    if (text && text.trim() !== old) await post(`/api/memories/${d.edit}/correct`, { text });
+    return;
+  }
+  if (d.retract) return post(`/api/memories/${d.retract}/retract`);
+  if (d.restore) return post(`/api/memories/${d.restore}/restore`);
+  if (d.pin) return post(`/api/memories/${d.pin}/pin`, { pinned: d.on === "1" });
+  if (d.merge) {
+    const other = prompt(`Merge which memory into #${d.merge}? Its number:`);
+    if (!other) return;
+    const text = prompt("Text of the merged memory (empty: keep this one's text):", "");
+    return post("/api/memories/merge", { keep: Number(d.merge), other: Number(other), text: text || null });
+  }
+  if (d.del && confirm(`Delete memory #${d.del} for good? (Retract keeps it out of answers without deleting it.)`)) {
+    await fetch(`/api/memories/${d.del}`, { method: "DELETE" });
+  }
+});
+$("onlyMe").addEventListener("change", (e) => post("/api/settings", { only_about_me: e.target.checked }));
+fetch("/api/settings").then((r) => r.ok && r.json()).then((s) => { if (s) $("onlyMe").checked = s.only_about_me; }).catch(() => {});
+$("forget10").onclick = async () => {
+  if (!confirm("Forget everything Kin remembered in the last 10 minutes?")) return;
+  const r = await (await fetch("/api/memories/forget?minutes=10", { method: "POST" })).json();
+  $("memCount").textContent = `forgot ${r.deleted.length} memories`;
+};
+$("memSearch").addEventListener("input", scheduleMemories);
+$("memHistory").addEventListener("change", scheduleMemories);
+
+async function showHistory(id) {
+  const el = document.querySelector(`[data-mem="${id}"]`);
+  const old = el?.querySelector(".ev");
+  if (old) { old.remove(); return; }
+  const d = await (await fetch(`/api/memories/${id}/history`)).json();
+  const chain = d.chain.map((f) => `${f.id == id ? "<b>" : ""}#${f.id} ${esc(f.status)}: ${esc(f.text)}${f.id == id ? "</b>" : ""}`).join("<br>");
+  const verb = { add: "added", correct: "corrected", retract: "retracted", restore: "restored", pin: "pinned", unpin: "unpinned", merge: "merged", supersede: "replaced" };
+  const log = (d.changes || []).map((c) => `${new Date(c.ts * 1000).toLocaleString()} · #${c.fact_id} ${verb[c.action] || c.action} (${esc(c.actor)})${c.new_text && c.action !== "add" ? `: “${esc(c.new_text)}”` : ""}`).join("<br>");
+  const ev = d.evidence.map((u) => u.purged ? `#${u.id} (raw line purged after retention)`
+    : `${new Date(u.ts * 1000).toLocaleString()} · ${esc(u.speaker || "speaker unknown")}: “${esc(u.text)}”`).join("<br>") || "no raw lines (said explicitly or from before v4)";
+  el?.insertAdjacentHTML("beforeend", `<div class="ev">${chain}${log ? `<br><br>Changes:<br>${log}` : ""}<br><br>Heard:<br>${ev}</div>`);
+}
+
+async function loadPeople() {
+  const res = await fetch("/api/people");
+  if (!res.ok) return;
+  const d = await res.json();
+  $("peopleList").innerHTML = d.items.map((p) => `
+    <div class="person"><span><a data-rename="${p.id}" data-name="${esc(p.name)}">${esc(p.name)}</a></span>
+      <button title="Remove ${esc(p.name)}" data-pdel="${p.id}">✕</button>
+      <span class="al">${p.aliases.length ? "also heard as " + p.aliases.map(esc).join(", ") : "no other spellings"} · <a data-alias="${p.id}" data-aliases="${esc(p.aliases.join(", "))}">edit</a></span></div>`).join("")
+    || '<p class="soon">No people yet.</p>';
+}
+$("peopleList").addEventListener("click", async (e) => {
+  const t = e.target.dataset;
+  const call = (url, method, body) => fetch(url, { method, headers: { "Content-Type": "application/json" }, body: body && JSON.stringify(body) });
+  if (t.rename) { const name = prompt("Correct name", t.name); if (name) await call(`/api/people/${t.rename}`, "PATCH", { name }); }
+  else if (t.alias) { const a = prompt("Other spellings (comma-separated)", t.aliases); if (a != null) await call(`/api/people/${t.alias}`, "PATCH", { aliases: a }); }
+  else if (t.pdel) { if (confirm("Remove this person? Facts that mention them stay.")) await call(`/api/people/${t.pdel}`, "DELETE"); }
+  else return;
+  loadPeople();
+});
+$("personAdd").onclick = async () => {
+  const name = $("personName").value.trim();
+  if (!name) return;
+  await fetch("/api/people", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name }) });
+  $("personName").value = "";
+  loadPeople();
+};
+
+// --- device panel -------------------------------------------------------------------------
+function press(on) {
+  if (on === held || (on && $("ptt").disabled)) return;
+  held = on;
+  $("ptt").classList.toggle("held", on);
+  $("ptt").textContent = on ? "Listening… release to finish" : "Hold to talk";
+  send("button", on);
+}
+
+$("mute").onchange = (e) => send("mute", e.target.checked);
+$("offline").onchange = (e) => send("offline", e.target.checked);
+$("pi5").onchange = (e) => { e.target.disabled = true; send("profile", e.target.checked ? "pi5" : "laptop"); };
+$("ptt").addEventListener("pointerdown", (e) => { e.preventDefault(); press(true); });
+["pointerup", "pointerleave", "pointercancel"].forEach((t) => $("ptt").addEventListener(t, () => press(false)));
+window.addEventListener("keydown", (e) => { if (e.code === "Space" && !e.repeat && e.target.tagName !== "INPUT") { e.preventDefault(); press(true); } });
+window.addEventListener("keyup", (e) => { if (e.code === "Space" && e.target.tagName !== "INPUT") { e.preventDefault(); press(false); } });
+window.addEventListener("blur", () => press(false));
+document.querySelectorAll(".tabs button").forEach((b) => b.onclick = () => {
+  document.querySelectorAll(".tabs button").forEach((x) => x.classList.toggle("on", x === b));
+  document.querySelectorAll("[data-pane]").forEach((p) => (p.hidden = p.dataset.pane !== b.dataset.tab));
+  if (b.dataset.tab === "system") refreshSystem();
+  if (b.dataset.tab === "network") loadNetwork();
+  if (b.dataset.tab === "tasks") loadTasks();
+});
+sysTimer = setInterval(() => { if (!document.querySelector('[data-pane="system"]').hidden) refreshSystem(); }, 2000);
+connect();
+fetch("/api/demo").then((r) => r.json()).then((d) => { $("demoTag").hidden = !d.demo; }).catch(() => {});
+$("demoReset").onclick = async () => {
+  if (!confirm("Reset the demo? This wipes the demo database and loads the made-up week again. Real memories are not touched.")) return;
+  const r = await post("/api/demo/reset");
+  if (r.ok) { const j = await r.json(); $("demoReset").textContent = `Reset (${j.facts} facts)`; setTimeout(() => ($("demoReset").textContent = "Reset demo"), 3000); }
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+# Questions for the Kin recall benchmark. All asked on Mon 5 Oct 2026 at 09:00, after the week in week.txt.
+#
+#   id        unique id; the prefix is the category
+#   cat       single_fact | lookup | time_scoped | latest_version | who_said | multi_fact | split |
+#             abstain | real_failure
+#   q         what the user asks (clean: the query STT is the larger model)
+#   expect    rule check: a list of groups; each group is a list of alternatives (or one string).
+#             A group matches if any alternative appears in the spoken answer (case-insensitive,
+#             number words -> digits, "1,850" -> "1850", "Saffron2026" -> "saffron 2026").
+#             Alternatives ending in a letter also match as a prefix ("promot" matches "promoted").
+#   min       how many groups must match (default: all)
+#   forbid    phrases that make the answer wrong if spoken
+#   support   ids of the line(s) in week.txt that hold the answer (retrieval recall@5 uses these)
+#   abstain   true: the right answer is "I don't remember" (nothing in the week answers it)
+#   accept_abstain  true: abstaining also counts as correct (the honest answer is partial)
+#   smoke     true: part of the 20-question smoke subset that runs in normal pytest
+#   answer    the reference answer in words (for the optional Gemma judge and for humans)
+
+questions:
+  # --- single fact -------------------------------------------------------------------------------
+  - {id: s01, cat: single_fact, q: "Where is Anil's wedding?", expect: [[pune]], support: ["1.22"], answer: "In Pune, on 14 November.", smoke: true}
+  - {id: s02, cat: single_fact, q: "Where is the team offsite?", expect: [[lonavala]], support: ["3.12"], answer: "Lonavala, 16-17 October.", smoke: true}
+  - {id: s03, cat: single_fact, q: "What book did Priyanka tell me to read?", expect: [[designing data, data-intensive, data intensive]], support: ["4.10"], answer: "Designing Data-Intensive Applications.", smoke: true}
+  - {id: s04, cat: single_fact, q: "What did Priyanka say about my draft?", expect: [[data quality]], support: ["4.09"], answer: "It's good, but add a section on data quality."}
+  - {id: s05, cat: single_fact, q: "Where did Priyanka study?", expect: [[iit bombay]], support: ["4.11"], answer: "IIT Bombay."}
+  - {id: s06, cat: single_fact, q: "Where is Sam's new flat?", expect: [[dharampeth]], support: ["5.17"], answer: "In Dharampeth, near Ram Nagar square."}
+  - {id: s07, cat: single_fact, q: "Where is Priya's farewell dinner?", expect: [[barbeque nation, barbecue nation, sitabuldi]], support: ["6.09"], answer: "Barbeque Nation in Sitabuldi."}
+  - {id: s08, cat: single_fact, q: "Where is my sister going for her master's?", expect: [[edinburgh]], support: ["2.19", "2.25"], answer: "Edinburgh."}
+  - {id: s09, cat: single_fact, q: "What was my idea about the flat expenses?", expect: [[app]], support: ["2.23"], answer: "A small app that tracks shared flat expenses."}
+  - {id: s10, cat: single_fact, q: "What did I want to do with the spare room?", expect: [[office]], support: ["5.19"], answer: "Turn it into a small home office."}
+  - {id: s11, cat: single_fact, q: "What does Arjun want from me?", expect: [[slides]], support: ["7.22"], answer: "The Orion demo slides by Monday noon."}
+  - {id: s12, cat: single_fact, q: "Why is Aunty Shobha coming to stay?", expect: [[diwali]], support: ["5.05"], answer: "For Diwali shopping."}
+  - {id: s13, cat: single_fact, q: "When is Anil's wedding?", expect: [[14], [november]], support: ["1.22"], answer: "14 November, in Pune."}
+  - {id: s14, cat: single_fact, q: "When does my passport expire?", expect: [[march]], support: ["3.14"], answer: "In March next year."}
+  - {id: s15, cat: single_fact, q: "When is Rahul's birthday?", expect: [[22], [october]], support: ["4.02"], answer: "22 October."}
+  - {id: s16, cat: single_fact, q: "When is my dad's birthday?", expect: [[9]], support: ["1.24"], answer: "On the 9th."}
+  - {id: s17, cat: single_fact, q: "When is the water going to be off?", expect: [[tuesday], [10]], support: ["7.07"], answer: "Tuesday, from 10 to 2."}
+  - {id: s18, cat: single_fact, q: "What do I need to call the bank about?", expect: [[double charge, charged twice, 2499]], support: ["6.15"], answer: "A double charge of 2,499 rupees."}
+  - {id: s19, cat: single_fact, q: "Where do I need to send Kavya's charger?", expect: [[delhi]], support: ["7.16"], answer: "Courier it to Delhi."}
+
+  # --- name / number / code / price lookup -------------------------------------------------------
+  - {id: n01, cat: lookup, q: "What's my gym locker code?", expect: [["4471"]], support: ["1.03"], answer: "4471.", smoke: true}
+  - {id: n02, cat: lookup, q: "What's the office wifi password?", expect: [[saffron2026]], support: ["1.17"], answer: "Saffron2026.", smoke: true}
+  - {id: n03, cat: lookup, q: "What's the wifi password at home?", expect: [[mangotree77]], support: ["6.11"], answer: "MangoTree77."}
+  - {id: n04, cat: lookup, q: "What's my Netflix password?", expect: [[bluefin88]], support: ["5.10"], answer: "bluefin88."}
+  - {id: n05, cat: lookup, q: "How much was the electricity bill?", expect: [["1850"]], support: ["1.20"], answer: "1,850 rupees.", smoke: true}
+  - {id: n06, cat: lookup, q: "How much did the plumber charge?", expect: [["900"]], support: ["2.17"], answer: "900 rupees."}
+  - {id: n07, cat: lookup, q: "How much will the rent be from November?", expect: [["18500"]], support: ["3.03"], answer: "18,500 rupees.", smoke: true}
+  - {id: n08, cat: lookup, q: "What is Neha's extension number?", expect: [["2314"]], support: ["2.09"], answer: "2314."}
+  - {id: n09, cat: lookup, q: "What's Priya's new phone number?", expect: [["98220 41377", "9822041377"]], support: ["3.20"], answer: "98220 41377."}
+  - {id: n10, cat: lookup, q: "How much is the car insurance renewal?", expect: [["14200"]], support: ["5.07"], answer: "14,200 rupees, due by the 20th."}
+  - {id: n11, cat: lookup, q: "Which coach and seats did I book on the train?", expect: [[b2], ["41"], ["42"]], support: ["5.15"], answer: "Coach B2, seats 41 and 42."}
+  - {id: n12, cat: lookup, q: "What's the bank's customer care number?", expect: [["1800 202 6161", "18002026161"]], support: ["7.13"], answer: "1800 202 6161."}
+  - {id: n13, cat: lookup, q: "How much did I spend at DMart?", expect: [["3200"]], support: ["4.17"], answer: "3,200 rupees."}
+  - {id: n14, cat: lookup, q: "How much did I give Rahul for the groceries?", expect: [["1600"]], support: ["7.09"], answer: "1,600 rupees."}
+  - {id: n15, cat: lookup, q: "What's my manager's name?", expect: [[arjun]], support: ["7.22"], answer: "Arjun."}
+  - {id: n16, cat: lookup, q: "What's my dentist's name?", expect: [[mehta]], support: ["2.02", "5.02"], answer: "Dr Mehta."}
+
+  # --- time-scoped (now = Mon 5 Oct, 09:00) --------------------------------------------------------
+  - {id: t01, cat: time_scoped, q: "What did I plan yesterday?", expect: [[badminton, gift, courier, charger]], support: ["7.02", "7.16", "7.20"], answer: "Joining the badminton club on Wednesdays, buying Dad a gift, couriering Kavya's charger."}
+  - {id: t02, cat: time_scoped, q: "What did Priyanka tell me on Thursday?", expect: [[data quality, designing data, data-intensive, iit, friday]], support: ["4.09", "4.10", "4.11", "4.13"], answer: "Add a data-quality section, read Designing Data-Intensive Applications, next session moves to Friday at 4."}
+  - {id: t03, cat: time_scoped, q: "What did Mum tell me last Monday?", expect: [[wedding, birthday]], support: ["1.22", "1.24"], answer: "Anil's wedding is on 14 November in Pune; Dad's birthday is on the 9th.", smoke: true}
+  - {id: t04, cat: time_scoped, q: "What did I spend money on last week?", expect: [[electricity, plumber, groceries, dmart, rahul]], support: ["1.20", "2.17", "4.17", "7.09"], answer: "Electricity bill, plumber, groceries at DMart, groceries share to Rahul."}
+  - {id: t05, cat: time_scoped, q: "Who did I meet at the cafe on Wednesday?", expect: [[priya]], forbid: [priyanka], support: ["2.24", "2.03", "2.05"], answer: "Priya."}
+  - {id: t06, cat: time_scoped, q: "What did the landlord tell me on Wednesday?", expect: [["18500", rent]], support: ["3.03", "3.05"], answer: "Rent goes up to 18,500 from November; pay before the 5th."}
+  - {id: t07, cat: time_scoped, q: "What did Kavya tell me on Saturday?", expect: [[peanut, cardiology, residency]], support: ["6.02", "6.17"], answer: "She's allergic to peanuts and starting a cardiology residency."}
+  - {id: t08, cat: time_scoped, q: "What did I book on Friday?", expect: [[train, lonavala]], support: ["5.15"], answer: "The train to Lonavala, coach B2, seats 41 and 42."}
+  - {id: t09, cat: time_scoped, q: "What did Neha tell me yesterday?", expect: [[quarterly review, review]], support: ["7.18"], answer: "The quarterly review moved to Tuesday the 13th at 3 pm.", smoke: true}
+  - {id: t10, cat: time_scoped, q: "What did I submit on Wednesday?", expect: [[draft]], support: ["3.09"], answer: "The project draft, to Priyanka."}
+
+  # --- latest version (a plan that changed) --------------------------------------------------------
+  - {id: v01, cat: latest_version, q: "What time did I meet Priya on Wednesday?", expect: [["5"]], support: ["2.24", "2.03", "3.07"], answer: "At 5 (moved from 4)."}
+  - {id: v02, cat: latest_version, q: "When is Priya's farewell dinner?", expect: [["8:30", "8.30", "830", "half past 8"]], support: ["6.07", "7.11"], answer: "Next Saturday at 8:30 (moved from 8).", smoke: true}
+  - {id: v03, cat: latest_version, q: "When is my dentist appointment?", expect: [[wednesday, "7"], ["6"]], support: ["2.02", "5.02"], answer: "Next Wednesday at 6 pm (moved from Friday 11:30).", smoke: true}
+  - {id: v04, cat: latest_version, q: "When is the quarterly review?", expect: [["13", tuesday], ["3"]], support: ["4.03", "7.18"], answer: "Tuesday the 13th at 3 pm (moved from Monday the 12th at 2)."}
+  - {id: v05, cat: latest_version, q: "When is my next mentoring session with Priyanka?", expect: [[friday], ["4"]], support: ["1.09", "4.13"], answer: "Friday at 4 this week (moved from Thursday at 3)."}
+  - {id: v06, cat: latest_version, q: "Who has my blue umbrella?", expect: [[return, back, "you have"]], support: ["2.15", "6.05"], answer: "You do: Sam gave it back on Saturday."}
+  - {id: v07, cat: latest_version, q: "When is the Orion client demo?", expect: [[tuesday, "6"], ["10"]], support: ["2.08"], answer: "Tuesday 6 October at 10."}
+
+  # --- who said what --------------------------------------------------------------------------------
+  - {id: w01, cat: who_said, q: "Who is vegan?", expect: [[rahul]], forbid: ["you are vegan", "you're vegan"], support: ["1.13"], answer: "Rahul.", smoke: true}
+  - {id: w02, cat: who_said, q: "Am I vegan?", expect: [[rahul, "no", "not"]], accept_abstain: true, forbid: ["you are vegan", "you're vegan", "yes"], support: ["1.13"], answer: "No; Rahul said he is vegan."}
+  - {id: w03, cat: who_said, q: "Who is allergic to peanuts?", expect: [[kavya]], forbid: ["you are allergic to peanuts", "you're allergic to peanuts"], support: ["6.02"], answer: "Kavya.", smoke: true}
+  - {id: w04, cat: who_said, q: "Who got promoted?", expect: [[priya]], forbid: [priyanka, "you got promoted", "you were promoted"], support: ["3.16"], answer: "Priya, to team lead."}
+  - {id: w05, cat: who_said, q: "Who is moving to Bangalore?", expect: [[priya]], forbid: [priyanka, "you are moving", "you're moving"], support: ["3.18"], answer: "Priya, in December."}
+  - {id: w06, cat: who_said, q: "Who said the rent is going up?", expect: [[landlord, vikram]], support: ["3.03"], answer: "The landlord, Vikram."}
+  - {id: w07, cat: who_said, q: "Who told me about the quarterly review?", expect: [[neha]], support: ["4.03", "7.18"], answer: "Neha."}
+  - {id: w08, cat: who_said, q: "Who is flying to Edinburgh in January?", expect: [[ananya, sister]], forbid: ["you are flying", "you're flying"], support: ["5.11", "2.25"], answer: "Ananya, your sister."}
+  - {id: w09, cat: who_said, q: "Who promised to return my umbrella?", expect: [[sam]], support: ["4.15"], answer: "Sam."}
+  - {id: w10, cat: who_said, q: "Who is Kavya?", expect: [[sister, doctor]], support: ["2.11", "6.04"], answer: "Rahul's sister, a doctor at AIIMS Delhi."}
+  - {id: w11, cat: who_said, q: "Am I allergic to anything?", expect: [[cat]], forbid: [peanut], support: ["4.20"], answer: "Cats."}
+
+  # --- multi-fact ------------------------------------------------------------------------------------
+  - {id: m01, cat: multi_fact, q: "What do I know about Rahul?", expect: [[vegan], [birthday, "22"], [kavya, sister], [groceries]], min: 2, support: ["1.13", "4.02", "2.11", "3.22"], answer: "Vegan since last month, birthday 22 October, sister Kavya, you split groceries.", smoke: true}
+  - {id: m02, cat: multi_fact, q: "What do I know about Priya?", expect: [[team lead, promot], [bangalore], [farewell, dinner], [number, "98220"]], min: 2, support: ["3.16", "3.18", "6.07", "3.20"], answer: "Promoted to team lead, moving to Bangalore in December, farewell dinner next Saturday."}
+  - {id: m03, cat: multi_fact, q: "Tell me about Priyanka.", expect: [[mentor, mentoring], [data scientist, third floor, iit, data quality, designing data]], min: 2, support: ["1.06", "1.07", "4.11", "4.09"], answer: "Your mentor; senior data scientist; studied at IIT Bombay."}
+  - {id: m04, cat: multi_fact, q: "What do I know about Kavya?", expect: [[peanut], [doctor, aiims], [cardiology, residency], [sister, rahul]], min: 2, support: ["6.02", "6.04", "6.17", "2.11"], answer: "Rahul's sister, a doctor at AIIMS Delhi, allergic to peanuts, starting cardiology residency."}
+  - {id: m05, cat: multi_fact, q: "What's coming up later in October?", expect: [[offsite, lonavala], [review], [birthday], [insurance], [shobha, aunty]], min: 2, support: ["3.12", "7.18", "4.02", "5.07", "5.03"], answer: "Offsite 16-17, quarterly review on the 13th, Rahul's birthday on the 22nd, insurance by the 20th."}
+  - {id: m06, cat: multi_fact, q: "What do I know about my sister Ananya?", expect: [[edinburgh, master], [january, flight, airport]], min: 2, support: ["2.19", "2.25", "5.11", "5.12"], answer: "Got into a master's at Edinburgh; flies on 5 January at 6 am; you're driving her."}
+  - {id: m07, cat: multi_fact, q: "What passwords have I mentioned?", expect: [[saffron2026], [mangotree77], [bluefin88]], min: 2, support: ["1.17", "6.11", "5.10"], answer: "Office wifi Saffron2026, home wifi MangoTree77, Netflix bluefin88."}
+  - {id: m08, cat: multi_fact, q: "What do I know about Sam?", expect: [[umbrella], [dharampeth, flat], [running], [cat]], min: 2, support: ["2.15", "5.17", "4.21", "4.20"], answer: "Borrowed and returned your umbrella, new flat in Dharampeth, maybe running together."}
+
+  # --- conversation split over several short lines ----------------------------------------------------
+  - {id: c01, cat: split, q: "Where was I meeting Priya on Wednesday?", expect: [[library]], support: ["2.05"], answer: "The library cafe.", smoke: true}
+  - {id: c02, cat: split, q: "How long is Rahul's sister staying with us?", expect: [[two nights, "2 nights", saturday, weekend]], support: ["2.13"], answer: "Two nights, Saturday and Sunday."}
+  - {id: c03, cat: split, q: "How long is Aunty Shobha staying?", expect: [[week]], support: ["5.05"], answer: "About a week."}
+  - {id: c04, cat: split, q: "What does Priyanka do at work?", expect: [[data scientist, senior]], support: ["1.07"], answer: "Senior data scientist on the third floor."}
+  - {id: c05, cat: split, q: "Since when has Rahul been vegan?", expect: [[last month, documentary]], support: ["1.15"], answer: "Since last month, after a documentary."}
+  - {id: c06, cat: split, q: "What time is Ananya's flight?", expect: [["6"]], support: ["5.12"], answer: "6 in the morning, on 5 January."}
+  - {id: c07, cat: split, q: "When do Ananya's classes in Edinburgh start?", expect: [["12"], [january]], support: ["2.21"], answer: "12 January."}
+
+  # --- must abstain: nothing in the week answers these --------------------------------------------------
+  - {id: a01, cat: abstain, q: "When is Neha's birthday?", abstain: true, smoke: true}
+  - {id: a02, cat: abstain, q: "What's my Amazon password?", abstain: true, smoke: true}
+  - {id: a03, cat: abstain, q: "What's my car's registration number?", abstain: true, smoke: true}
+  - {id: a04, cat: abstain, q: "What is Vikram's phone number?", abstain: true}
+  - {id: a05, cat: abstain, q: "What did the doctor say about my blood test?", abstain: true}
+  - {id: a06, cat: abstain, q: "Where does Neha live?", abstain: true}
+  - {id: a07, cat: abstain, q: "What's Arjun's email address?", abstain: true}
+  - {id: a08, cat: abstain, q: "How much did the dinner at Barbeque Nation cost?", abstain: true}
+  - {id: a09, cat: abstain, q: "What time is my yoga class?", abstain: true}
+  - {id: a10, cat: abstain, q: "Who is Rohan?", abstain: true, smoke: true}
+  - {id: a11, cat: abstain, q: "What's the PIN for my bank card?", abstain: true}
+  - {id: a12, cat: abstain, q: "When is Sam's birthday?", abstain: true}
+  - {id: a13, cat: abstain, q: "What did Priyanka say about my promotion?", abstain: true}
+  - {id: a14, cat: abstain, q: "What's the name of Priya's new company?", abstain: true}
+  - {id: a15, cat: abstain, q: "What is my blood group?", abstain: true}
+  - {id: a16, cat: abstain, q: "How much did my new laptop cost?", abstain: true}
+  - {id: a17, cat: abstain, q: "When is my sister's wedding?", abstain: true}
+  - {id: a18, cat: abstain, q: "What's Kavya's phone number?", abstain: true}
+
+  # --- the owner's real failures (reported from use) ------------------------------------------------------
+  # Seen: "Who is Priyanka?" -> "I don't remember who Priyanka is."
+  #       "Who is my mentor?" -> "I don't remember that. [#]"   (also a raw citation marker spoken aloud)
+  #       "Who is my mentor?" -> "I'm not sure. I couldn't find that in what I remember."  (gate-blocked)
+  - {id: r01, cat: real_failure, q: "Who is Priyanka?", expect: [[mentor, data scientist]], support: ["1.06", "1.07"], answer: "Your mentor for the analytics project, a senior data scientist."}
+  - {id: r02, cat: real_failure, q: "Who is my mentor?", expect: [[priyanka]], support: ["1.06"], answer: "Priyanka.", smoke: true}
+  - {id: r03, cat: real_failure, q: "Who's my mentor for the analytics project?", expect: [[priyanka]], support: ["1.06"], answer: "Priyanka."}

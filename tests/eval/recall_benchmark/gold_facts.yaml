@@ -1,0 +1,110 @@
+# Gold facts for the recall benchmark week: what a perfect extractor would store, one fact per decision,
+# attributed to the real speaker (week.txt's ground truth), with absolute dates (the week is Mon 28 Sep -
+# Sun 4 Oct 2026). Used by the answer oracle (the ceiling of the answer step) and to score extraction
+# precision and recall.
+#
+#   id      unique id
+#   lines   the week.txt lines that state it (a split conversation lists all its lines)
+#   text    the fact
+#   status  active | superseded (an older version of a later fact)
+#   split   true: the fact only exists when several short lines are merged
+
+facts:
+  - {id: g01, lines: ["1.03"], text: "The user's gym locker code is 4471."}
+  - {id: g02, lines: ["1.06"], text: "Priyanka is going to be the user's mentor for the new analytics project."}
+  - {id: g03, lines: ["1.06", "1.07"], text: "Priyanka is the senior data scientist on the third floor.", split: true}
+  - {id: g04, lines: ["1.09"], text: "The user and Priyanka have mentoring sessions every Thursday at 3 pm."}
+  - {id: g05, lines: ["1.11"], text: "Priyanka wants the user's project draft by Wednesday 30 September 2026 evening."}
+  - {id: g06, lines: ["1.13"], text: "Rahul is vegan, so no paneer or ghee for him."}
+  - {id: g07, lines: ["1.13", "1.15"], text: "Rahul has been vegan since last month, after a documentary.", split: true}
+  - {id: g08, lines: ["1.17"], text: "The office wifi password is Saffron2026."}
+  - {id: g09, lines: ["1.20"], text: "The user paid 1,850 rupees for the electricity bill."}
+  - {id: g10, lines: ["1.22"], text: "Mum said the user's cousin Anil's wedding is on 14 November 2026 in Pune."}
+  - {id: g11, lines: ["1.24"], text: "Mum said the user's father's (Dad's) birthday is on 9 October."}
+  - {id: g12, lines: ["2.02"], text: "The user had a dentist appointment with Dr Mehta on Friday 2 October 2026 at 11:30.", status: superseded}
+  - {id: g13, lines: ["2.03", "2.05", "2.24"], text: "The user and Priya meet at the library cafe on Wednesday 30 September 2026 at 4 pm.", status: superseded, split: true}
+  - {id: g14, lines: ["2.08"], text: "The Orion client demo is on Tuesday 6 October 2026 at 10 am."}
+  - {id: g15, lines: ["2.09"], text: "Neha's extension number is 2314."}
+  - {id: g16, lines: ["2.11"], text: "Rahul's sister Kavya visits this weekend."}
+  - {id: g17, lines: ["2.11", "2.13"], text: "Kavya stays with Rahul and the user for two nights, Saturday 3 and Sunday 4 October 2026.", split: true}
+  - {id: g18, lines: ["2.15"], text: "The user lent Sam their blue umbrella.", status: superseded}
+  - {id: g19, lines: ["2.17"], text: "The plumber charged 900 rupees to fix the kitchen tap."}
+  - {id: g20, lines: ["2.19", "2.25"], text: "The user's sister Ananya got into a master's program at Edinburgh."}
+  - {id: g21, lines: ["2.19", "2.21"], text: "Ananya's classes in Edinburgh start on 12 January 2027.", split: true}
+  - {id: g22, lines: ["2.23"], text: "The user's idea: build a small app that tracks the shared flat expenses."}
+  - {id: g23, lines: ["3.03"], text: "The landlord Vikram said the rent goes up to 18,500 rupees from November."}
+  - {id: g24, lines: ["3.03", "3.05"], text: "Vikram said to pay the rent to the same account as always, before the 5th.", split: true}
+  - {id: g25, lines: ["2.03", "2.05", "2.24", "3.07"], text: "The user and Priya meet at the library cafe on Wednesday 30 September 2026 at 5 pm.", split: true}
+  - {id: g26, lines: ["3.09"], text: "The user submitted the project draft to Priyanka on Wednesday 30 September 2026."}
+  - {id: g27, lines: ["3.12"], text: "The team offsite is in Lonavala on 16 and 17 October 2026."}
+  - {id: g28, lines: ["3.14"], text: "The user's passport expires in March 2027 and needs renewing."}
+  - {id: g29, lines: ["3.16"], text: "Priya got promoted to team lead."}
+  - {id: g30, lines: ["3.18"], text: "Priya is moving to Bangalore in December 2026 for the new role."}
+  - {id: g31, lines: ["3.20"], text: "Priya's new phone number is 98220 41377."}
+  - {id: g32, lines: ["3.22"], text: "The user and Rahul split the groceries fifty-fifty."}
+  - {id: g33, lines: ["4.02"], text: "Rahul's birthday is on 22 October."}
+  - {id: g34, lines: ["4.03"], text: "Neha said the quarterly review is on Monday 12 October 2026 at 2 pm.", status: superseded}
+  - {id: g35, lines: ["4.06"], text: "The user's new laptop arrives on Thursday 8 October 2026."}
+  - {id: g36, lines: ["4.09"], text: "Priyanka said the user's draft is good but needs a section on data quality."}
+  - {id: g37, lines: ["4.10"], text: "Priyanka told the user to read Designing Data-Intensive Applications before their next session."}
+  - {id: g38, lines: ["4.11"], text: "Priyanka studied at IIT Bombay, the same as the user's manager."}
+  - {id: g39, lines: ["4.13"], text: "Priyanka moved the next mentoring session to Friday 9 October 2026 at 4 pm because she travels on Thursday."}
+  - {id: g40, lines: ["4.15"], text: "Sam promised to return the user's umbrella on Saturday 3 October 2026.", status: superseded}
+  - {id: g41, lines: ["4.17"], text: "The user spent 3,200 rupees on groceries at DMart."}
+  - {id: g42, lines: ["4.20"], text: "The user is allergic to cats, so cannot stay long at Sam's place."}
+  - {id: g43, lines: ["4.21"], text: "The user's idea: start running on weekends with Sam."}
+  - {id: g44, lines: ["5.02"], text: "The user's dentist appointment with Dr Mehta is on Wednesday 7 October 2026 at 6 pm."}
+  - {id: g45, lines: ["5.03"], text: "Mum said Aunty Shobha is coming to stay from 10 October 2026."}
+  - {id: g46, lines: ["5.03", "5.05"], text: "Aunty Shobha stays about a week, for Diwali shopping.", split: true}
+  - {id: g47, lines: ["5.07"], text: "The car insurance renewal is 14,200 rupees, due by the 20th."}
+  - {id: g48, lines: ["5.10"], text: "The user's Netflix password is bluefin88."}
+  - {id: g49, lines: ["5.11"], text: "Ananya's flight to Edinburgh is on 5 January 2027."}
+  - {id: g50, lines: ["5.11", "5.12", "5.13"], text: "The user will drive Ananya to the airport for her 6 am flight on 5 January 2027.", split: true}
+  - {id: g51, lines: ["5.15"], text: "The user booked the train to Lonavala, coach B2, seats 41 and 42."}
+  - {id: g52, lines: ["5.17"], text: "Sam's new flat is in Dharampeth, near Ram Nagar square."}
+  - {id: g53, lines: ["5.19"], text: "The user's idea: turn the spare room into a small home office."}
+  - {id: g54, lines: ["6.02"], text: "Kavya is allergic to peanuts."}
+  - {id: g55, lines: ["6.04"], text: "Kavya is a doctor at AIIMS Delhi."}
+  - {id: g56, lines: ["6.05"], text: "Sam returned the user's blue umbrella on Saturday 3 October 2026."}
+  - {id: g57, lines: ["6.07", "6.09"], text: "Priya's farewell dinner is on Saturday 10 October 2026 at 8 pm at Barbeque Nation in Sitabuldi.", status: superseded, split: true}
+  - {id: g58, lines: ["6.07", "6.09", "7.11"], text: "Priya's farewell dinner is on Saturday 10 October 2026 at 8:30 pm at Barbeque Nation in Sitabuldi.", split: true}
+  - {id: g59, lines: ["6.11"], text: "The home wifi password is MangoTree77."}
+  - {id: g60, lines: ["6.12"], text: "Kavya's train back to Delhi is on Sunday 4 October 2026 at 7 pm."}
+  - {id: g61, lines: ["6.15"], text: "The user needs to call the bank about a double charge of 2,499 rupees."}
+  - {id: g62, lines: ["6.17"], text: "Kavya is starting a cardiology residency next year."}
+  - {id: g63, lines: ["6.19"], text: "The user's idea: a trip to Goa in February with everyone."}
+  - {id: g64, lines: ["7.02"], text: "The user wants to buy a gift for Dad's birthday."}
+  - {id: g65, lines: ["7.03"], text: "Mum wants everyone home for dinner on Dad's birthday at 8 pm."}
+  - {id: g66, lines: ["7.05"], text: "The user finished the first three chapters of the book Priyanka recommended."}
+  - {id: g67, lines: ["7.07"], text: "The landlord said the water will be off on Tuesday 6 October 2026 from 10 am to 2 pm."}
+  - {id: g68, lines: ["7.09"], text: "The user gave Rahul 1,600 rupees for their half of the groceries."}
+  - {id: g69, lines: ["7.13"], text: "The bank's customer care number is 1800 202 6161."}
+  - {id: g70, lines: ["7.16"], text: "Kavya left her charger; the user needs to courier it to Delhi."}
+  - {id: g71, lines: ["7.18"], text: "Neha said the quarterly review moved to Tuesday 13 October 2026 at 3 pm."}
+  - {id: g72, lines: ["7.20"], text: "The user decided to join the badminton club on Wednesday nights."}
+  - {id: g73, lines: ["7.22"], text: "The user's manager Arjun wants the Orion demo slides by Monday 5 October 2026 noon."}
+  # --- lines x.40-x.45 (Prompt 5 test set) ---
+  - {id: g74, lines: ["1.40"], text: "Meera from accounts said the expense reports are due on the 15th."}
+  - {id: g75, lines: ["1.42", "1.44"], text: "Karan and the user play tennis on Thursday 1 October 2026 at 7 at the club courts near Seminary Hills.", status: superseded, split: true}
+  - {id: g76, lines: ["1.45"], text: "Karan's daughter Tara just turned five."}
+  - {id: g77, lines: ["2.40"], text: "The pharmacy said the user's prescription will be ready on Thursday 1 October 2026.", status: superseded}
+  - {id: g78, lines: ["2.41", "2.43"], text: "The book club meets at Divya's place on Friday 2 October 2026 at 6 and is reading The Midnight Library.", status: superseded, split: true}
+  - {id: g79, lines: ["2.44"], text: "Imran is switching jobs to Infosys next month."}
+  - {id: g80, lines: ["3.40"], text: "The car service is booked for Saturday 3 October 2026 at 9 at the Maruti workshop.", status: superseded}
+  - {id: g81, lines: ["1.42", "1.44", "3.41"], text: "Tennis with Karan moved to Friday 2 October 2026 at 7.", status: superseded, split: true}
+  - {id: g82, lines: ["3.43"], text: "Meera is allergic to shellfish."}
+  - {id: g83, lines: ["3.44"], text: "Divya's new phone number is 97300 55821."}
+  - {id: g84, lines: ["4.40"], text: "The user's prescription is delayed to Saturday 3 October 2026."}
+  - {id: g85, lines: ["4.41", "4.43"], text: "Imran and the user have lunch on Tuesday 6 October 2026 at 1 pm at Haldiram's on Wardha Road.", status: superseded, split: true}
+  - {id: g86, lines: ["4.45"], text: "The user's sister Ananya's birthday is on 3 December."}
+  - {id: g87, lines: ["5.40"], text: "The book club moved to Saturday 3 October 2026 at 6."}
+  - {id: g88, lines: ["5.41"], text: "The office parking permit number is 7731."}
+  - {id: g89, lines: ["4.41", "5.42"], text: "Lunch with Imran on Tuesday 6 October 2026 is now at Barbeque Nation because Haldiram's is fully booked.", split: true}
+  - {id: g90, lines: ["5.44"], text: "Karan's wife Nisha is a teacher at Bishop Cotton School."}
+  - {id: g91, lines: ["6.40"], text: "The car service moved to Monday 5 October 2026 at 10."}
+  - {id: g92, lines: ["6.41"], text: "Meera is running the half marathon on 25 October 2026."}
+  - {id: g93, lines: ["6.43", "6.45"], text: "The electrician is coming on Monday 5 October 2026 around 9 am.", split: true}
+  - {id: g94, lines: ["7.40"], text: "The user renewed the gym membership for 6 months for 7,500 rupees."}
+  - {id: g95, lines: ["7.41"], text: "Divya said the book club book for next month is Sapiens."}
+  - {id: g96, lines: ["7.43"], text: "Tennis with Karan moved again, to Saturday 10 October 2026 at 8 am."}
+  - {id: g97, lines: ["7.44"], text: "Imran's new office is in Hinjewadi, Pune."}
