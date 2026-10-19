@@ -286,3 +286,5 @@ scripts/     demo.py (umbrella scenario) · download_models.py
 | Kin never memorises itself | The mic is ducked whenever Kin is audible | `test_kin_never_memorises_its_own_voice` |
 | Mute closes the stream; the LED tells the truth | The stream is aborted and closed. The LED is derived from the real stream state. | `test_mute_*`, `test_led_*` |
 | UI cannot be abused cross-site | Binds to 127.0.0.1. The Origin header is checked on the WebSocket and on every state change. | `test_cross_site_*`, `test_tasks_api_complete_delete_and_csrf` |
+#   k i n _ p r o  
+ 
